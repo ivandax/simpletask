@@ -2,7 +2,7 @@ const router = require('express').Router();
 var bcrypt = require('bcryptjs');
 const User = require('../models/UserModel');
 
-const { registerValidation } = require('./authValidation');
+const { registerValidation, loginValidation } = require('./authValidation');
 
 router.post('/register', async (req, res) => {
     const validation = registerValidation(req.body);
@@ -29,6 +29,25 @@ router.post('/register', async (req, res) => {
     } catch (err) {
         res.status(400).send(err);
     }
+});
+
+router.post('/login', async (req, res) => {
+    const validation = loginValidation(req.body);
+    if (validation.error !== undefined) {
+        return res.status(400).send(validation.error.details[0].message);
+    }
+    //check if email already exists in the database
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) {
+        return res.status(400).send('Email or password is wrong');
+    }
+    //check password validity
+    const validPass = await bcrypt.compare(req.body.password, user.password);
+    if (!validPass) {
+        return res.status(400).send('Invalid password');
+    }
+
+    res.send('logged in');
 });
 
 router.post('/test', async (req, res) => {
