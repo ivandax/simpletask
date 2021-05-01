@@ -1,6 +1,7 @@
 const router = require('express').Router();
 var bcrypt = require('bcryptjs');
 const User = require('../models/UserModel');
+const jwt = require('jsonwebtoken');
 
 const { registerValidation, loginValidation } = require('./authValidation');
 
@@ -47,7 +48,11 @@ router.post('/login', async (req, res) => {
         return res.status(400).send('Invalid password');
     }
 
-    res.send('logged in');
+    //create and assing a json web token for session
+    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET, {
+        expiresIn: 60,
+    });
+    res.header('auth-token', token).send(token);
 });
 
 router.post('/test', async (req, res) => {
