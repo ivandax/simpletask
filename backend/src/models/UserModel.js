@@ -2,6 +2,12 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema(
     {
+        companyName: {
+            type: String,
+            required: true,
+            min: 6,
+            max: 30,
+        },
         name: {
             type: String,
             required: true,
@@ -19,6 +25,10 @@ const userSchema = new mongoose.Schema(
             required: true,
             min: 6,
             max: 1024,
+        },
+        verified: {
+            type: Boolean,
+            default: false,
         },
     },
     { timestamps: true }

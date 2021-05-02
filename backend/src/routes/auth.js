@@ -1,9 +1,13 @@
 const router = require('express').Router();
-var bcrypt = require('bcryptjs');
-const User = require('../models/UserModel');
+const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 
+const User = require('../models/UserModel');
+const EmailVerification = require('../models/EmailVerification');
+
 const { registerValidation, loginValidation } = require('./authValidation');
+const { getVerificationEmail, getNodemailerOptions } = require('./variables');
 
 router.post('/register', async (req, res) => {
     const validation = registerValidation(req.body);
@@ -20,15 +24,50 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
     const user = new User({
+        companyName: validation.value.name,
         name: validation.value.name,
         email: validation.value.email,
         password: hashedPassword,
     });
     try {
         const savedUser = await user.save();
-        res.send({ user: savedUser._id });
-    } catch (err) {
-        res.status(400).send(err);
+        console.log('created user' + savedUser._id);
+        try {
+            const emailSalt = await bcrypt.genSalt(10);
+            const hashedEmail = await bcrypt.hash(savedUser.email, emailSalt);
+            const smtpTransport = nodemailer.createTransport(
+                getNodemailerOptions(
+                    process.env.EMAIL_HOST,
+                    process.env.EMAIL_USER,
+                    process.env.EMAIL_PASSWORD
+                )
+            );
+            try {
+                await smtpTransport.sendMail(
+                    getVerificationEmail(
+                        process.env.EMAIL_USER,
+                        savedUser.email,
+                        hashedEmail
+                    )
+                );
+                console.log('verification email sent');
+                const emailVerificationDoc = new EmailVerification({
+                    verificationToken: hashedEmail,
+                    userId: savedUser._id,
+                });
+                const savedEmailVerificationDoc = await emailVerificationDoc.save();
+                res.send({
+                    user: savedUser._id,
+                    verificationDoc: savedEmailVerificationDoc._id,
+                });
+            } catch (e) {
+                res.status(400).send(e);
+            }
+        } catch (e) {
+            res.status(400).send(e);
+        }
+    } catch (e) {
+        res.status(400).send(e);
     }
 });
 
