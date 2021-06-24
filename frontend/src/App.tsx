@@ -6,14 +6,16 @@ import "./App.css";
 import Login from "PublicViews/Login/";
 import SignUp from "PublicViews/SignUp";
 
-const PrivateRoute = () => {
+const PrivateRoute = (): JSX.Element => {
     const authenticated = false;
     if (authenticated === false) {
         return <Redirect to="/login" />;
-    } else return <Route path="/" component={() => <>Home</>}></Route>;
+    } else {
+        return <Route path="/" component={(): JSX.Element => <>Home</>}></Route>;
+    }
 };
 
-function App() {
+function App(): JSX.Element {
     return (
         <div className="App">
             <Router>
