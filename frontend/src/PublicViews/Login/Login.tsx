@@ -19,6 +19,7 @@ const Login = (): JSX.Element => {
         email: "",
         password: "",
     };
+    console.log(`renders for Login`);
 
     return (
         <Container>
@@ -31,12 +32,14 @@ const Login = (): JSX.Element => {
                     {(formik): JSX.Element => (
                         <form onSubmit={formik.handleSubmit}>
                             <StringInput
+                                identifier="email"
                                 value={formik.values.email}
                                 onChange={formik.handleChange}
                                 formikTouched={formik.touched.email}
                                 formikErrors={formik.errors.email}
                             />
                             <StringInput
+                                identifier="password"
                                 value={formik.values.password}
                                 onChange={formik.handleChange}
                                 formikTouched={formik.touched.password}
