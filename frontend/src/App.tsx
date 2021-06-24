@@ -1,6 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
+import { ThemeProvider } from "@material-ui/core";
 import "./App.css";
+import { customTheme } from "Styles/theme";
 
 //pages
 import Login from "PublicViews/Login/";
@@ -18,13 +20,15 @@ const PrivateRoute = (): JSX.Element => {
 function App(): JSX.Element {
     return (
         <div className="App">
-            <Router>
-                <Switch>
-                    <Route path="/login" component={Login}></Route>
-                    <Route path="/sign-up" component={SignUp}></Route>
-                    <PrivateRoute />
-                </Switch>
-            </Router>
+            <ThemeProvider theme={customTheme}>
+                <Router>
+                    <Switch>
+                        <Route path="/login" component={Login}></Route>
+                        <Route path="/sign-up" component={SignUp}></Route>
+                        <PrivateRoute />
+                    </Switch>
+                </Router>
+            </ThemeProvider>
         </div>
     );
 }
