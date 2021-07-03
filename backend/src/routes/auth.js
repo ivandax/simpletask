@@ -7,7 +7,7 @@ const User = require('../models/UserModel');
 const EmailVerification = require('../models/EmailVerification');
 
 const { registerValidation, loginValidation } = require('./authValidation');
-const { getVerificationEmail, getNodemailerOptions } = require('./variables');
+const { getVerificationEmail, getNodemailerOptions } = require('./nodemailer');
 
 router.post('/register', async (req, res) => {
     const validation = registerValidation(req.body);
@@ -24,7 +24,7 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
     const user = new User({
-        companyName: validation.value.name,
+        companyName: validation.value.companyName,
         name: validation.value.name,
         email: validation.value.email,
         password: hashedPassword,
