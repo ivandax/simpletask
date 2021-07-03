@@ -1,12 +1,12 @@
 import { makeStyles } from "@material-ui/core";
 
-export const useLoginStyles = makeStyles(() => ({
-    loginContainer: {
+export const useSignUpStyles = makeStyles(() => ({
+    signUpContainer: {
         width: "300px",
         margin: "0 auto",
         paddingTop: "150px",
     },
-    loginForm: {
+    signUpForm: {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",

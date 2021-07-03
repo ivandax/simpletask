@@ -2,17 +2,14 @@ import React from "react";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { Button } from "@material-ui/core";
-import { useRootStyles } from "./styles";
+import { useLoginStyles } from "./styles";
 
 //components
 import StringInput from "Components/StringInput";
 
 const validationSchema = yup.object({
     email: yup.string().email("Enter a valid email").required("Email is required"),
-    password: yup
-        .string()
-        .min(8, "Password should be of minimum 8 characters length")
-        .required("Password is required"),
+    password: yup.string().required("Password is required"),
 });
 
 const Login = (): JSX.Element => {
@@ -20,7 +17,7 @@ const Login = (): JSX.Element => {
         email: "",
         password: "",
     };
-    const classes = useRootStyles();
+    const classes = useLoginStyles();
     console.log(`renders for Login`);
 
     return (
@@ -34,6 +31,7 @@ const Login = (): JSX.Element => {
                     <form onSubmit={formik.handleSubmit} className={classes.loginForm}>
                         <StringInput
                             identifier="email"
+                            label="Email"
                             value={formik.values.email}
                             onChange={formik.handleChange}
                             formikTouched={formik.touched.email}
@@ -41,13 +39,20 @@ const Login = (): JSX.Element => {
                         />
                         <StringInput
                             identifier="password"
+                            label="Password"
                             value={formik.values.password}
                             onChange={formik.handleChange}
                             formikTouched={formik.touched.password}
                             formikErrors={formik.errors.password}
                             type="password"
                         />
-                        <Button color="primary" variant="contained" fullWidth type="submit">
+                        <Button
+                            color="primary"
+                            variant="contained"
+                            fullWidth
+                            type="submit"
+                            className={classes.submitButton}
+                        >
                             Submit
                         </Button>
                     </form>
