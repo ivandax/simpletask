@@ -9,6 +9,8 @@ const EmailVerification = require('../models/EmailVerification');
 const { registerValidation, loginValidation } = require('./authValidation');
 const { getVerificationEmail, getNodemailerOptions } = require('./nodemailer');
 
+const defaultError = (e) => res.status(400).send(e);
+
 router.post('/register', async (req, res) => {
     const validation = registerValidation(req.body);
     if (validation.error !== undefined) {
@@ -26,7 +28,7 @@ router.post('/register', async (req, res) => {
         email: validation.value.email,
         password: hashedPassword,
     });
-    const savedUser = await user.save().catch((e) => res.status(400).send(e));
+    const savedUser = await user.save().catch(defaultError);
     console.log('created user' + savedUser._id);
     const emailToken = jwt.sign(
         { email: validation.value.email, random: Math.random() * 100 },
@@ -43,7 +45,7 @@ router.post('/register', async (req, res) => {
         .sendMail(
             getVerificationEmail(process.env.EMAIL_USER, savedUser.email, emailToken)
         )
-        .catch((e) => res.status(400).send(e));
+        .catch(defaultError);
     console.log('verification email sent');
     const emailVerificationDoc = new EmailVerification({
         verificationToken: emailToken,
@@ -51,7 +53,7 @@ router.post('/register', async (req, res) => {
     });
     const savedEmailVerificationDoc = await emailVerificationDoc
         .save()
-        .catch((e) => res.status(400).send(e));
+        .catch(defaultError);
     res.send({
         user: savedUser._id,
         verificationDoc: savedEmailVerificationDoc._id,
@@ -95,9 +97,12 @@ router.post('/verify', async (req, res) => {
         return res.status(400).send('No validation doc exists for this user');
     }
     if (emailToken === validationDoc.verificationToken) {
-        console.log('match found!!');
+        console.log('Email verification match found!');
+        await user.update({ verified: true }).catch(defaultError);
+        const updatedUser = await User.findById(user._id).catch(defaultError);
         res.send({
-            res: 'Match!!!',
+            mesage: 'email verified',
+            user: updatedUser,
         });
     } else {
         return res.status(400).send('Could not verify user');
