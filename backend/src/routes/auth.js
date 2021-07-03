@@ -81,6 +81,29 @@ router.post('/login', async (req, res) => {
     res.header('auth-token', token).send(token);
 });
 
+router.post('/verify', async (req, res) => {
+    const email = req.body.email;
+    const emailToken = req.body.token;
+    const user = await User.findOne({ email: req.body.email });
+    console.log(email, emailToken);
+    console.log('found user' + user);
+    if (!user) {
+        return res.status(400).send('User not found');
+    }
+    const validationDoc = await EmailVerification.findOne({ userId: user.id });
+    if (!validationDoc) {
+        return res.status(400).send('No validation doc exists for this user');
+    }
+    if (emailToken === validationDoc.verificationToken) {
+        console.log('match found!!');
+        res.send({
+            res: 'Match!!!',
+        });
+    } else {
+        return res.status(400).send('Could not verify user');
+    }
+});
+
 router.post('/test', async (req, res) => {
     res.send('test working ok...');
 });
