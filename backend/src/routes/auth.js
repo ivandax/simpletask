@@ -33,8 +33,11 @@ router.post('/register', async (req, res) => {
         const savedUser = await user.save();
         console.log('created user' + savedUser._id);
         try {
-            const emailSalt = await bcrypt.genSalt(10);
-            const hashedEmail = await bcrypt.hash(savedUser.email, emailSalt);
+            const emailToken = jwt.sign(
+                { email: validation.value.email, random: Math.random() * 100 },
+                process.env.EMAIL_TOKEN_SECRET
+            );
+            console.log(emailToken);
             const smtpTransport = nodemailer.createTransport(
                 getNodemailerOptions(
                     process.env.EMAIL_HOST,
@@ -47,12 +50,12 @@ router.post('/register', async (req, res) => {
                     getVerificationEmail(
                         process.env.EMAIL_USER,
                         savedUser.email,
-                        hashedEmail
+                        emailToken
                     )
                 );
                 console.log('verification email sent');
                 const emailVerificationDoc = new EmailVerification({
-                    verificationToken: hashedEmail,
+                    verificationToken: emailToken,
                     userId: savedUser._id,
                 });
                 const savedEmailVerificationDoc = await emailVerificationDoc.save();
