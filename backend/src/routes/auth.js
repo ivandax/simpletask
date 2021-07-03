@@ -18,60 +18,44 @@ router.post('/register', async (req, res) => {
     if (emailExists) {
         return res.status(400).send('Email already exists');
     }
-
-    //hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
-
     const user = new User({
         companyName: validation.value.companyName,
         name: validation.value.name,
         email: validation.value.email,
         password: hashedPassword,
     });
-    try {
-        const savedUser = await user.save();
-        console.log('created user' + savedUser._id);
-        try {
-            const emailToken = jwt.sign(
-                { email: validation.value.email, random: Math.random() * 100 },
-                process.env.EMAIL_TOKEN_SECRET
-            );
-            console.log(emailToken);
-            const smtpTransport = nodemailer.createTransport(
-                getNodemailerOptions(
-                    process.env.EMAIL_HOST,
-                    process.env.EMAIL_USER,
-                    process.env.EMAIL_PASSWORD
-                )
-            );
-            try {
-                await smtpTransport.sendMail(
-                    getVerificationEmail(
-                        process.env.EMAIL_USER,
-                        savedUser.email,
-                        emailToken
-                    )
-                );
-                console.log('verification email sent');
-                const emailVerificationDoc = new EmailVerification({
-                    verificationToken: emailToken,
-                    userId: savedUser._id,
-                });
-                const savedEmailVerificationDoc = await emailVerificationDoc.save();
-                res.send({
-                    user: savedUser._id,
-                    verificationDoc: savedEmailVerificationDoc._id,
-                });
-            } catch (e) {
-                res.status(400).send(e);
-            }
-        } catch (e) {
-            res.status(400).send(e);
-        }
-    } catch (e) {
-        res.status(400).send(e);
-    }
+    const savedUser = await user.save().catch((e) => res.status(400).send(e));
+    console.log('created user' + savedUser._id);
+    const emailToken = jwt.sign(
+        { email: validation.value.email, random: Math.random() * 100 },
+        process.env.EMAIL_TOKEN_SECRET
+    );
+    const smtpTransport = nodemailer.createTransport(
+        getNodemailerOptions(
+            process.env.EMAIL_HOST,
+            process.env.EMAIL_USER,
+            process.env.EMAIL_PASSWORD
+        )
+    );
+    await smtpTransport
+        .sendMail(
+            getVerificationEmail(process.env.EMAIL_USER, savedUser.email, emailToken)
+        )
+        .catch((e) => res.status(400).send(e));
+    console.log('verification email sent');
+    const emailVerificationDoc = new EmailVerification({
+        verificationToken: emailToken,
+        userId: savedUser._id,
+    });
+    const savedEmailVerificationDoc = await emailVerificationDoc
+        .save()
+        .catch((e) => res.status(400).send(e));
+    res.send({
+        user: savedUser._id,
+        verificationDoc: savedEmailVerificationDoc._id,
+    });
 });
 
 router.post('/login', async (req, res) => {
