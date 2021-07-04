@@ -12,7 +12,10 @@ const validationSchema = yup.object({
     name: yup.string(),
     email: yup.string().email("Enter a valid email").required("Email is required"),
     password: yup.string().required("Password is required"),
-    repeatPassword: yup.string().required("Please, repeat the password"),
+    repeatPassword: yup
+        .string()
+        .required("Please, repeat the password")
+        .oneOf([yup.ref("password"), null], "The passwords are not equal"),
 });
 
 const SignUp = (): JSX.Element => {
