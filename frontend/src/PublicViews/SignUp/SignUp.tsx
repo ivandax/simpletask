@@ -1,4 +1,5 @@
 import React from "react";
+import { useDispatch } from "react-redux";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { Button } from "@material-ui/core";
@@ -7,12 +8,16 @@ import { useSignUpStyles } from "./styles";
 //components
 import StringInput from "Components/StringInput";
 
+// redux actions
+import { registerUser } from "PublicViews/Root/RootReducer";
+
 const validationSchema = yup.object({
     name: yup.string(),
     email: yup.string().email("Enter a valid email").required("Email is required"),
-    password: yup.string().required("Password is required"),
+    password: yup.string().min(8).required("Password is required"),
     repeatPassword: yup
         .string()
+        .min(8)
         .required("Please, repeat the password")
         .oneOf([yup.ref("password"), null], "The passwords are not equal"),
 });
@@ -27,12 +32,16 @@ const SignUp = (): JSX.Element => {
     const classes = useSignUpStyles();
     console.log(`renders for SignUp`);
 
+    const dispatch = useDispatch();
+
     return (
         <div className={classes.signUpContainer}>
             <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}
-                onSubmit={(values): void => console.log(values)}
+                onSubmit={({ name, email, password }): void => {
+                    dispatch(registerUser(name, email, password));
+                }}
             >
                 {(formik): JSX.Element => (
                     <form onSubmit={formik.handleSubmit} className={classes.signUpForm}>

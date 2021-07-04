@@ -1,33 +1,41 @@
 import { User } from "Domain/user";
+import { AsyncOp } from "Helpers/asyncOp";
+import { DefaultError } from "Domain/error";
 
 export interface RootState {
-    user: User | null;
+    userRegistration: AsyncOp<User, DefaultError>;
 }
 
 const initialRootState: RootState = {
-    user: null,
+    userRegistration: { status: "pending" },
 };
 
 export enum RootActionType {
-    LOAD_USER = "[ROOT] - Load User",
+    REGISTER_USER = "[ROOT] - REGISTER USER",
 }
 
-export interface LoadUserAction {
-    type: typeof RootActionType.LOAD_USER;
+export interface RegisterUserAction {
+    type: typeof RootActionType.REGISTER_USER;
+    name: string;
+    email: string;
+    password: string;
 }
 
-export type RootAction = LoadUserAction;
+export type RootAction = RegisterUserAction;
 
-export function loadUser(): LoadUserAction {
+export function registerUser(name: string, email: string, password: string): RegisterUserAction {
     return {
-        type: RootActionType.LOAD_USER,
+        type: RootActionType.REGISTER_USER,
+        name,
+        email,
+        password,
     };
 }
 
 export function rootReducer(state: RootState = initialRootState, action: RootAction): RootState {
     switch (action.type) {
-        case RootActionType.LOAD_USER: {
-            return state;
+        case RootActionType.REGISTER_USER: {
+            return { ...state, userRegistration: { status: "in-progress" } };
         }
         default:
             return state;
