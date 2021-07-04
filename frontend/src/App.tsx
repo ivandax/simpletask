@@ -1,34 +1,24 @@
 import React from "react";
-import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
+import { Provider } from "react-redux";
 import { ThemeProvider } from "@material-ui/core";
 import "./App.css";
 import { customTheme } from "Styles/theme";
 
-//pages
-import Login from "PublicViews/Login/";
-import SignUp from "PublicViews/SignUp";
+//root
+import Root from "PublicViews/Root";
 
-const PrivateRoute = (): JSX.Element => {
-    const authenticated = false;
-    if (authenticated === false) {
-        return <Redirect to="/login" />;
-    } else {
-        return <Route path="/" component={(): JSX.Element => <>Home</>}></Route>;
-    }
-};
+//store
+import { configureStore } from "Store/configure-store";
+export const store = configureStore();
 
 function App(): JSX.Element {
     return (
         <div className="App">
-            <ThemeProvider theme={customTheme}>
-                <Router>
-                    <Switch>
-                        <Route path="/login" component={Login}></Route>
-                        <Route path="/sign-up" component={SignUp}></Route>
-                        <PrivateRoute />
-                    </Switch>
-                </Router>
-            </ThemeProvider>
+            <Provider store={store}>
+                <ThemeProvider theme={customTheme}>
+                    <Root />
+                </ThemeProvider>
+            </Provider>
         </div>
     );
 }
