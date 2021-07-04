@@ -20,7 +20,6 @@ const StringInput = ({
     formikErrors,
     type,
 }: StringInputProps): JSX.Element => {
-    console.log(`renders for ${identifier}`);
     return (
         <TextField
             id={identifier}
