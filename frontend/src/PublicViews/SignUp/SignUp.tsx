@@ -8,7 +8,6 @@ import { useSignUpStyles } from "./styles";
 import StringInput from "Components/StringInput";
 
 const validationSchema = yup.object({
-    companyName: yup.string(),
     name: yup.string(),
     email: yup.string().email("Enter a valid email").required("Email is required"),
     password: yup.string().required("Password is required"),
@@ -20,7 +19,6 @@ const validationSchema = yup.object({
 
 const SignUp = (): JSX.Element => {
     const initialValues = {
-        companyName: "",
         name: "",
         email: "",
         password: "",
@@ -38,14 +36,6 @@ const SignUp = (): JSX.Element => {
             >
                 {(formik): JSX.Element => (
                     <form onSubmit={formik.handleSubmit} className={classes.signUpForm}>
-                        <StringInput
-                            identifier="companyName"
-                            label="Company Name"
-                            value={formik.values.companyName}
-                            onChange={formik.handleChange}
-                            formikTouched={formik.touched.companyName}
-                            formikErrors={formik.errors.companyName}
-                        />
                         <StringInput
                             identifier="name"
                             label="Name"

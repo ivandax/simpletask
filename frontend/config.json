@@ -1,0 +1,7 @@
+{
+    "users": {
+        "register": "http://localhost:3001/api/users/register",
+        "verify": "http://localhost:3001/api/users/verify",
+        "login": "http://localhost:3001/api/users/login"
+    }
+}
