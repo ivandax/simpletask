@@ -9,6 +9,7 @@ const EmailVerification = require('../models/EmailVerification');
 const { registerValidation, loginValidation } = require('./authValidation');
 const { getVerificationEmail, getNodemailerOptions } = require('./nodemailer');
 
+//helpers
 const defaultError = (e) => res.status(400).send(e);
 
 router.post('/register', async (req, res) => {
@@ -51,7 +52,14 @@ router.post('/register', async (req, res) => {
         userId: savedUser._id,
     });
     await emailVerificationDoc.save().catch(defaultError);
-    res.send(savedUser);
+    res.send({
+        verified: savedUser.verified,
+        _id: savedUser.id,
+        name: savedUser.name,
+        email: savedUser.email,
+        createdAt: savedUser.createdAt,
+        updatedAt: savedUser.updatedAt,
+    });
 });
 
 router.post('/login', async (req, res) => {
