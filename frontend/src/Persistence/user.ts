@@ -16,16 +16,18 @@ import { config } from "Persistence/config";
 //helpers
 import { Dictionary } from "Helpers/types";
 
-const UserCodec = t.type(
-    {
-        verified: t.boolean,
-        _id: t.string,
-        name: t.string,
-        email: t.string,
-        createdAt: t.string,
-        updatedAt: t.string,
-    },
-    "UserCodec"
+const UserCodec = t.exact(
+    t.type(
+        {
+            verified: t.boolean,
+            _id: t.string,
+            name: t.string,
+            email: t.string,
+            createdAt: t.string,
+            updatedAt: t.string,
+        },
+        "UserCodec"
+    )
 );
 
 interface RegistrationPayload {
