@@ -50,13 +50,8 @@ router.post('/register', async (req, res) => {
         verificationToken: emailToken,
         userId: savedUser._id,
     });
-    const savedEmailVerificationDoc = await emailVerificationDoc
-        .save()
-        .catch(defaultError);
-    res.send({
-        user: savedUser._id,
-        verificationDoc: savedEmailVerificationDoc._id,
-    });
+    await emailVerificationDoc.save().catch(defaultError);
+    res.send(savedUser);
 });
 
 router.post('/login', async (req, res) => {
