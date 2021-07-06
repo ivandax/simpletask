@@ -52,14 +52,7 @@ router.post('/register', async (req, res) => {
         userId: savedUser._id,
     });
     await emailVerificationDoc.save().catch(defaultError);
-    res.send({
-        verified: savedUser.verified,
-        _id: savedUser.id,
-        name: savedUser.name,
-        email: savedUser.email,
-        createdAt: savedUser.createdAt,
-        updatedAt: savedUser.updatedAt,
-    });
+    res.send({ success: true });
 });
 
 router.post('/login', async (req, res) => {
@@ -68,21 +61,31 @@ router.post('/login', async (req, res) => {
         return res.status(400).send(validation.error.details[0].message);
     }
     //check if email already exists in the database
-    const user = await User.findOne({ email: req.body.email });
-    if (!user) {
+    const savedUser = await User.findOne({ email: req.body.email });
+    if (!savedUser) {
         return res.status(400).send('Email or password is wrong');
     }
     //check password validity
-    const validPass = await bcrypt.compare(req.body.password, user.password);
+    const validPass = await bcrypt.compare(req.body.password, savedUser.password);
     if (!validPass) {
         return res.status(400).send('Invalid password');
     }
 
     //create and assing a json web token for session
-    const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET, {
+    const token = jwt.sign({ _id: savedUser._id }, process.env.TOKEN_SECRET, {
         expiresIn: 60,
     });
-    res.header('auth-token', token).send(token);
+    res.header('auth-token', token).send({
+        user: {
+            verified: savedUser.verified,
+            _id: savedUser.id,
+            name: savedUser.name,
+            email: savedUser.email,
+            createdAt: savedUser.createdAt,
+            updatedAt: savedUser.updatedAt,
+        },
+        token,
+    });
 });
 
 router.post('/verify', async (req, res) => {
