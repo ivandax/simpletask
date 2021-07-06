@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { Button } from "@material-ui/core";
@@ -7,9 +7,13 @@ import { useSignUpStyles } from "./styles";
 
 //components
 import StringInput from "Components/StringInput";
+import LoadingOverlay from "Components/LoadingOverlay";
 
 // redux actions
 import { registerUser } from "PublicViews/Root/RootReducer";
+
+// state
+import { State } from "Store/state";
 
 const validationSchema = yup.object({
     name: yup.string(),
@@ -33,9 +37,11 @@ const SignUp = (): JSX.Element => {
     console.log(`renders for SignUp`);
 
     const dispatch = useDispatch();
+    const rootState = useSelector((state: State) => state.root);
 
     return (
         <div className={classes.signUpContainer}>
+            {rootState.userRegistration.status === "in-progress" ? <LoadingOverlay /> : null}
             <Formik
                 initialValues={initialValues}
                 validationSchema={validationSchema}

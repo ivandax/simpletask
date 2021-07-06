@@ -19,3 +19,7 @@ export const palette: Palette = {
         contrastText: "#fff",
     },
 };
+
+export const custom = {
+    transparentBlack: "rgba(0, 0, 0, 0.3)",
+};
