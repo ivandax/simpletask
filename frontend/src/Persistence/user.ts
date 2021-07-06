@@ -65,7 +65,7 @@ export function registerUser(
     );
 }
 
-const _errorMessageCodec = t.exact(
+const errorMessageCodec = t.exact(
     t.type({
         _error: t.exact(
             t.type({
@@ -88,7 +88,7 @@ function parseResponseError(axiosError: axiosTypes.AxiosError): DefaultError {
         const defaultMsg = "Undetermined Error";
         const errorMsg = pipe(
             axiosError.response.data,
-            _errorMessageCodec.decode,
+            errorMessageCodec.decode,
             E.map((decodedData) => decodedData._error.message),
             E.getOrElse(() => defaultMsg)
         );
