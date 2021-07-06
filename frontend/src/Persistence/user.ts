@@ -8,7 +8,7 @@ import * as t from "io-ts";
 
 // domain
 import { DefaultError } from "Domain/error";
-import { User } from "Domain/user";
+// import { User } from "Domain/user";
 
 //persistence
 import { config } from "Persistence/config";
@@ -16,19 +16,19 @@ import { config } from "Persistence/config";
 //helpers
 import { Dictionary } from "Helpers/types";
 
-const UserCodec = t.exact(
-    t.type(
-        {
-            verified: t.boolean,
-            _id: t.string,
-            name: t.string,
-            email: t.string,
-            createdAt: t.string,
-            updatedAt: t.string,
-        },
-        "UserCodec"
-    )
-);
+// const UserCodec = t.exact(
+//     t.type(
+//         {
+//             verified: t.boolean,
+//             _id: t.string,
+//             name: t.string,
+//             email: t.string,
+//             createdAt: t.string,
+//             updatedAt: t.string,
+//         },
+//         "UserCodec"
+//     )
+// );
 
 interface RegistrationPayload {
     name: string;
@@ -36,24 +36,30 @@ interface RegistrationPayload {
     password: string;
 }
 
+const SuccessResponseDecoder = t.exact(
+    t.type({
+        success: t.boolean,
+    })
+);
+
 export function registerUser(
     payload: RegistrationPayload
-): Observable<E.Either<DefaultError, User>> {
+): Observable<E.Either<DefaultError, boolean>> {
     return Axios.post(config.users.register, payload, {
         headers: {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
         },
     }).pipe(
         catchError((error) => {
             throw parseResponseError(error);
         }),
         map(extractResponseBody),
-        map(UserCodec.decode),
+        map(SuccessResponseDecoder.decode),
+        map(E.map((decoded) => decoded.success)),
         map(
             E.mapLeft((errors) => {
                 console.log(errors);
-                return { error: "User Codec Decoding Error" };
+                return { error: "Success Response Decoding Error" };
             })
         )
     );

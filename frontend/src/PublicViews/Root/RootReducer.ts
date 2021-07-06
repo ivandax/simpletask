@@ -1,9 +1,9 @@
-import { User } from "Domain/user";
+// import { User } from "Domain/user";
 import { AsyncOp } from "Helpers/asyncOp";
 import { DefaultError } from "Domain/error";
 
 export interface RootState {
-    userRegistration: AsyncOp<User, DefaultError>;
+    userRegistration: AsyncOp<boolean, DefaultError>;
 }
 
 const initialRootState: RootState = {
@@ -24,7 +24,7 @@ export interface RegisterUserAction {
 }
 export interface RegisterUserSuccessAction {
     type: typeof RootActionType.REGISTER_USER_SUCCESS;
-    user: User;
+    result: boolean;
 }
 export interface RegisterUserFailureAction {
     type: typeof RootActionType.REGISTER_USER_FAILURE;
@@ -42,10 +42,10 @@ export function registerUser(name: string, email: string, password: string): Reg
     };
 }
 
-export function registerUserSuccess(user: User): RegisterUserSuccessAction {
+export function registerUserSuccess(result: boolean): RegisterUserSuccessAction {
     return {
         type: RootActionType.REGISTER_USER_SUCCESS,
-        user,
+        result,
     };
 }
 
@@ -62,7 +62,7 @@ export function rootReducer(state: RootState = initialRootState, action: RootAct
             return { ...state, userRegistration: { status: "in-progress" } };
         }
         case RootActionType.REGISTER_USER_SUCCESS: {
-            return { ...state, userRegistration: { status: "successful", data: action.user } };
+            return { ...state, userRegistration: { status: "successful", data: action.result } };
         }
         case RootActionType.REGISTER_USER_FAILURE: {
             return { ...state, userRegistration: { status: "failed", error: action.error } };

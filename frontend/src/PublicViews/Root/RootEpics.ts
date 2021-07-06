@@ -12,7 +12,7 @@ import * as userPersistence from "Persistence/user";
 
 //domain
 import { DefaultError } from "Domain/error";
-import { User } from "Domain/user";
+// import { User } from "Domain/user";
 
 const registerUserEpic: Epic<
     reducer.RootAction,
@@ -36,12 +36,12 @@ const registerUserEpic: Epic<
                             eitherRegisterUser,
                             E.fold<
                                 DefaultError,
-                                User,
+                                boolean,
                                 | reducer.RegisterUserSuccessAction
                                 | reducer.RegisterUserFailureAction
                             >(
                                 (error) => reducer.registerUserFailure(error),
-                                (user) => reducer.registerUserSuccess(user)
+                                (result) => reducer.registerUserSuccess(result)
                             )
                         )
                     ),
