@@ -15,6 +15,9 @@ const { stringError } = require('./helpers');
 // eslint-disable-next-line no-undef
 const env = process.env;
 
+// vars
+const successMessage = { success: true };
+
 router.post('/register', async (req, res) => {
     const validation = registerValidation(req.body);
     if (validation.error !== undefined) {
@@ -49,7 +52,7 @@ router.post('/register', async (req, res) => {
         userId: savedUser._id,
     });
     await emailVerificationDoc.save().catch((e) => res.status(400).send(e));
-    res.send({ success: true });
+    res.send(successMessage);
 });
 
 router.post('/login', async (req, res) => {
@@ -60,12 +63,12 @@ router.post('/login', async (req, res) => {
     //check if email already exists in the database
     const savedUser = await User.findOne({ email: req.body.email });
     if (!savedUser) {
-        return res.status(400).send('Email or password is wrong');
+        return res.status(400).send(stringError('Email or password is wrong'));
     }
     //check password validity
     const validPass = await bcrypt.compare(req.body.password, savedUser.password);
     if (!validPass) {
-        return res.status(400).send('Invalid password');
+        return res.status(400).send(stringError('Invalid password'));
     }
 
     //create and assing a json web token for session
@@ -92,29 +95,21 @@ router.post('/verify', async (req, res) => {
     console.log(email, emailToken);
     console.log(`Found user ${user}`);
     if (!user) {
-        return res.status(400).send('User not found');
+        return res.status(400).send(stringError('User not found'));
     }
-    const validationDoc = await EmailVerification.findOne({ userId: user.id });
-    if (!validationDoc) {
-        return res.status(400).send('No validation doc exists for this user');
+    const verificationDoc = await EmailVerification.findOne({ userId: user.id });
+    if (!verificationDoc) {
+        return res
+            .status(400)
+            .send(stringError('No verification doc exists for this user'));
     }
-    if (emailToken === validationDoc.verificationToken) {
+    if (emailToken === verificationDoc.verificationToken) {
         console.log('Email verification match found!');
         await user.update({ verified: true }).catch((e) => res.status(400).send(e));
-        const updatedUser = await User.findById(user._id).catch((e) =>
-            res.status(400).send(e)
-        );
-        res.send({
-            mesage: 'email verified',
-            user: updatedUser,
-        });
+        res.send(successMessage);
     } else {
-        return res.status(400).send('Could not verify user');
+        return res.status(400).send(stringError('Could not verify user'));
     }
-});
-
-router.post('/test', async (req, res) => {
-    res.send('test working ok...');
 });
 
 module.exports = router;
