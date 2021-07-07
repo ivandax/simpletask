@@ -25,7 +25,7 @@ router.post('/register', async (req, res) => {
     }
     const emailExists = await User.findOne({ email: req.body.email });
     if (emailExists) {
-        return res.status(400).send(stringError('User already exists'));
+        return res.status(400).send(stringError('user already exists'));
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
@@ -63,12 +63,12 @@ router.post('/login', async (req, res) => {
     //check if email already exists in the database
     const savedUser = await User.findOne({ email: req.body.email });
     if (!savedUser) {
-        return res.status(400).send(stringError('Email or password is wrong'));
+        return res.status(400).send(stringError('email or password is wrong'));
     }
     //check password validity
     const validPass = await bcrypt.compare(req.body.password, savedUser.password);
     if (!validPass) {
-        return res.status(400).send(stringError('Invalid password'));
+        return res.status(400).send(stringError('invalid password'));
     }
 
     //create and assing a json web token for session
@@ -95,20 +95,20 @@ router.post('/verify', async (req, res) => {
     console.log(email, emailToken);
     console.log(`Found user ${user}`);
     if (!user) {
-        return res.status(400).send(stringError('User not found'));
+        return res.status(400).send(stringError('user not found'));
     }
     const verificationDoc = await EmailVerification.findOne({ userId: user.id });
     if (!verificationDoc) {
         return res
             .status(400)
-            .send(stringError('No verification doc exists for this user'));
+            .send(stringError('no verification doc exists for this user'));
     }
     if (emailToken === verificationDoc.verificationToken) {
         console.log('Email verification match found!');
         await user.update({ verified: true }).catch((e) => res.status(400).send(e));
         res.send(successMessage);
     } else {
-        return res.status(400).send(stringError('Could not verify user'));
+        return res.status(400).send(stringError('could not verify user'));
     }
 });
 
