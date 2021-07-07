@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-d
 //pages
 import Login from "PublicViews/Login/";
 import SignUp from "PublicViews/SignUp";
+import Verify from "PublicViews/Verify";
 
 const PrivateRoute = (): JSX.Element => {
     const authenticated = false;
@@ -20,9 +21,7 @@ const Root = (): JSX.Element => {
             <Switch>
                 <Route path="/login" component={Login}></Route>
                 <Route path="/sign-up" component={SignUp}></Route>
-                <Route path="/verify">
-                    <div>hello world</div>
-                </Route>
+                <Route path="/verify" component={Verify}></Route>
                 <PrivateRoute />
             </Switch>
         </Router>

@@ -1,35 +1,81 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router";
+import { useSelector, useDispatch } from "react-redux";
 import { Button } from "@material-ui/core";
 import { useVerifyStyles } from "./styles";
+import querystring from "querystring";
+import * as E from "fp-ts/Either";
+import * as O from "fp-ts/Option";
+import * as t from "io-ts";
+import { pipe } from "fp-ts/function";
 
 //components
 import LoadingOverlay from "Components/LoadingOverlay";
 import AlertDisplay from "Components/AlertDisplay";
 
 // redux actions
-// import { registerUser } from "PublicViews/Root/RootReducer";
+import { verifyUser } from "PublicViews/Root/RootReducer";
 
 // state
 import { State } from "Store/state";
 
+const UrlParamsDecoder = t.exact(
+    t.type({
+        email: t.string,
+        ref: t.string,
+    })
+);
+
 const Verify = (): JSX.Element => {
     const classes = useVerifyStyles();
+    const location = useLocation();
+    const dispatch = useDispatch();
 
-    // const dispatch = useDispatch();
-    const rootState = useSelector((state: State) => state.root);
+    const verificationState = useSelector((state: State) => state.root.userVerification);
+
+    const [decodingError, setDecodingError] = useState<O.Option<string>>(O.none);
+
+    useEffect((): void => {
+        const query = querystring.parse(location.search.substring(1, location.search.length));
+        pipe(
+            query,
+            UrlParamsDecoder.decode,
+            E.fold(
+                () => setDecodingError(O.some("Could not decode query params")),
+                ({ email, ref }) => dispatch(verifyUser(email, ref))
+            )
+        );
+    }, []);
 
     const Main = (): JSX.Element => {
-        switch (rootState.userRegistration.status) {
+        switch (verificationState.status) {
             case "pending":
             case "in-progress":
             case "re-executing":
                 return (
                     <div className={classes.verify}>
-                        {rootState.userRegistration.status === "in-progress" ||
-                        rootState.userRegistration.status === "re-executing" ? (
-                            <LoadingOverlay />
-                        ) : null}
+                        {pipe(
+                            decodingError,
+                            O.fold(
+                                () => <LoadingOverlay />,
+                                (error) => (
+                                    <>
+                                        <AlertDisplay
+                                            severity="error"
+                                            title="Verification Error"
+                                            message={error}
+                                        />
+                                        <Button
+                                            href="/login"
+                                            variant="outlined"
+                                            className={classes.redirectButton}
+                                        >
+                                            Go to Login
+                                        </Button>
+                                    </>
+                                )
+                            )
+                        )}
                     </div>
                 );
             case "failed":
@@ -37,7 +83,7 @@ const Verify = (): JSX.Element => {
                     <AlertDisplay
                         severity="error"
                         title="Verification Problem"
-                        message={rootState.userRegistration.error.error}
+                        message={verificationState.error.error}
                     />
                 );
             case "successful":
