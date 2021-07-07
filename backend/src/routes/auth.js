@@ -3,12 +3,17 @@ const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 
+// models
 const User = require('../models/UserModel');
 const EmailVerification = require('../models/EmailVerification');
 
+//helpers
 const { registerValidation, loginValidation } = require('./authValidation');
 const { getVerificationEmail, getNodemailerOptions } = require('./nodemailer');
-const { defaultErrorRes, stringError } = require('./helpers');
+const { stringError } = require('./helpers');
+
+// eslint-disable-next-line no-undef
+const env = process.env;
 
 router.post('/register', async (req, res) => {
     const validation = registerValidation(req.body);
@@ -26,30 +31,24 @@ router.post('/register', async (req, res) => {
         email: validation.value.email,
         password: hashedPassword,
     });
-    const savedUser = await user.save().catch(defaultErrorRes);
-    console.log('created user' + savedUser._id);
+    const savedUser = await user.save().catch((e) => res.status(400).send(e));
+    console.log(`Created User ${savedUser._id}`);
     const emailToken = jwt.sign(
         { email: validation.value.email, random: Math.random() * 100 },
-        process.env.EMAIL_TOKEN_SECRET
+        env.EMAIL_TOKEN_SECRET
     );
     const smtpTransport = nodemailer.createTransport(
-        getNodemailerOptions(
-            process.env.EMAIL_HOST,
-            process.env.EMAIL_USER,
-            process.env.EMAIL_PASSWORD
-        )
+        getNodemailerOptions(env.EMAIL_HOST, env.EMAIL_USER, env.EMAIL_PASSWORD)
     );
     await smtpTransport
-        .sendMail(
-            getVerificationEmail(process.env.EMAIL_USER, savedUser.email, emailToken)
-        )
-        .catch(defaultErrorRes);
+        .sendMail(getVerificationEmail(env.EMAIL_USER, savedUser.email, emailToken))
+        .catch((e) => res.status(400).send(e));
     console.log('verification email sent');
     const emailVerificationDoc = new EmailVerification({
         verificationToken: emailToken,
         userId: savedUser._id,
     });
-    await emailVerificationDoc.save().catch(defaultErrorRes);
+    await emailVerificationDoc.save().catch((e) => res.status(400).send(e));
     res.send({ success: true });
 });
 
@@ -70,7 +69,7 @@ router.post('/login', async (req, res) => {
     }
 
     //create and assing a json web token for session
-    const token = jwt.sign({ _id: savedUser._id }, process.env.TOKEN_SECRET, {
+    const token = jwt.sign({ _id: savedUser._id }, env.TOKEN_SECRET, {
         expiresIn: 60,
     });
     res.header('auth-token', token).send({
@@ -91,7 +90,7 @@ router.post('/verify', async (req, res) => {
     const emailToken = req.body.token;
     const user = await User.findOne({ email: req.body.email });
     console.log(email, emailToken);
-    console.log('found user' + user);
+    console.log(`Found user ${user}`);
     if (!user) {
         return res.status(400).send('User not found');
     }
@@ -101,8 +100,10 @@ router.post('/verify', async (req, res) => {
     }
     if (emailToken === validationDoc.verificationToken) {
         console.log('Email verification match found!');
-        await user.update({ verified: true }).catch(defaultErrorRes);
-        const updatedUser = await User.findById(user._id).catch(defaultErrorRes);
+        await user.update({ verified: true }).catch((e) => res.status(400).send(e));
+        const updatedUser = await User.findById(user._id).catch((e) =>
+            res.status(400).send(e)
+        );
         res.send({
             mesage: 'email verified',
             user: updatedUser,

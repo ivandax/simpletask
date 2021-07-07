@@ -9,7 +9,7 @@ const emailVerificationSchema = new mongoose.Schema(
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
-        }
+        },
     },
     { timestamps: true }
 );

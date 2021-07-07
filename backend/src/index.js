@@ -4,7 +4,7 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-var cors = require('cors');
+const cors = require('cors');
 
 // import routes
 const authRoute = require('./routes/auth');
@@ -14,6 +14,7 @@ const authRoute = require('./routes/auth');
 dotenv.config();
 
 mongoose.connect(
+    // eslint-disable-next-line no-undef
     process.env.DB_CONNECT,
     { useNewUrlParser: true, useUnifiedTopology: true },
     () => console.log('connected to database')

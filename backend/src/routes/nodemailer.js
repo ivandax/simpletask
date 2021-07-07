@@ -14,7 +14,7 @@ const getNodemailerOptions = (host, user, password) => ({
         user,
         pass: password,
     },
-})
+});
 
 module.exports.getVerificationEmail = getVerificationEmail;
 module.exports.getNodemailerOptions = getNodemailerOptions;

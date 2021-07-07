@@ -2,6 +2,9 @@ const jwt = require('jsonwebtoken');
 
 const { stringError } = require('./helpers');
 
+// eslint-disable-next-line no-undef
+const env = process.env;
+
 module.exports = function (req, res, next) {
     const token = req.header('auth-token');
     if (!token) {
@@ -9,7 +12,7 @@ module.exports = function (req, res, next) {
     }
     try {
         //verified is the payload of the jwt
-        const verified = jwt.verify(token, process.env.TOKEN_SECRET);
+        const verified = jwt.verify(token, env.TOKEN_SECRET);
         req.user = verified;
         next();
     } catch (err) {

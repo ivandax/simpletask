@@ -5,8 +5,11 @@
         "es6": true
     },
     "extends": [
-        "airbnb-base",
-        "prettier"
+        "eslint:recommended",
+        "eslint-config-prettier"
+    ],
+    "plugins": [
+        "eslint-plugin-prettier"
     ],
     "globals": {
         "Atomics": "readonly",
@@ -16,7 +19,6 @@
         "ecmaVersion": 2018
     },
     "rules": {
-        "strict": "error",
 		"prettier/prettier": "error",
 		"no-var": "error",
 		"no-param-reassign": "error",
