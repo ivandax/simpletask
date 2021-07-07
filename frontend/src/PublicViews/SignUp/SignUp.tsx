@@ -109,16 +109,25 @@ const SignUp = (): JSX.Element => {
                 );
             case "failed":
                 return (
-                    <div>
-                        <AlertDisplay
-                            severity="error"
-                            title="Registration Problem"
-                            message={rootState.userRegistration.error.error}
-                        />
-                    </div>
+                    <AlertDisplay
+                        severity="error"
+                        title="Registration Problem"
+                        message={rootState.userRegistration.error.error}
+                    />
                 );
             case "successful":
-                return <div>Verification Message sent!</div>;
+                return (
+                    <div className={classes.successMessage}>
+                        <AlertDisplay
+                            severity="success"
+                            title="Email Verification Sent"
+                            message="Please, check your email and click on the link to verify your account"
+                        />
+                        <Button href="/login" variant="outlined" className={classes.redirectButton}>
+                            Go to Login
+                        </Button>
+                    </div>
+                );
         }
     };
 

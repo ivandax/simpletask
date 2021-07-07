@@ -18,4 +18,12 @@ export const useSignUpStyles = makeStyles(() => ({
     submitButton: {
         marginTop: "20px",
     },
+    successMessage: {
+        display: "flex",
+        flexDirection: "column",
+    },
+    redirectButton: {
+        alignSelf: "center",
+        marginTop: "20px",
+    },
 }));
