@@ -8,15 +8,12 @@ const EmailVerification = require('../models/EmailVerification');
 
 const { registerValidation, loginValidation } = require('./authValidation');
 const { getVerificationEmail, getNodemailerOptions } = require('./nodemailer');
-
-//helpers
-const defaultError = (e) => res.status(400).send(e);
-const stringError = (string) => ({ _error: { message: string } });
+const { defaultErrorRes, stringError } = require('./helpers');
 
 router.post('/register', async (req, res) => {
     const validation = registerValidation(req.body);
     if (validation.error !== undefined) {
-        return res.status(400).send(validation.error.details[0].message);
+        return res.status(400).send(stringError(validation.error.details[0].message));
     }
     const emailExists = await User.findOne({ email: req.body.email });
     if (emailExists) {
@@ -29,7 +26,7 @@ router.post('/register', async (req, res) => {
         email: validation.value.email,
         password: hashedPassword,
     });
-    const savedUser = await user.save().catch(defaultError);
+    const savedUser = await user.save().catch(defaultErrorRes);
     console.log('created user' + savedUser._id);
     const emailToken = jwt.sign(
         { email: validation.value.email, random: Math.random() * 100 },
@@ -46,13 +43,13 @@ router.post('/register', async (req, res) => {
         .sendMail(
             getVerificationEmail(process.env.EMAIL_USER, savedUser.email, emailToken)
         )
-        .catch(defaultError);
+        .catch(defaultErrorRes);
     console.log('verification email sent');
     const emailVerificationDoc = new EmailVerification({
         verificationToken: emailToken,
         userId: savedUser._id,
     });
-    await emailVerificationDoc.save().catch(defaultError);
+    await emailVerificationDoc.save().catch(defaultErrorRes);
     res.send({ success: true });
 });
 
@@ -104,8 +101,8 @@ router.post('/verify', async (req, res) => {
     }
     if (emailToken === validationDoc.verificationToken) {
         console.log('Email verification match found!');
-        await user.update({ verified: true }).catch(defaultError);
-        const updatedUser = await User.findById(user._id).catch(defaultError);
+        await user.update({ verified: true }).catch(defaultErrorRes);
+        const updatedUser = await User.findById(user._id).catch(defaultErrorRes);
         res.send({
             mesage: 'email verified',
             user: updatedUser,
