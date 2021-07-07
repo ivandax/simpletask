@@ -8,6 +8,7 @@ import { useSignUpStyles } from "./styles";
 //components
 import StringInput from "Components/StringInput";
 import LoadingOverlay from "Components/LoadingOverlay";
+import AlertDisplay from "Components/AlertDisplay";
 
 // redux actions
 import { registerUser } from "PublicViews/Root/RootReducer";
@@ -107,7 +108,15 @@ const SignUp = (): JSX.Element => {
                     </div>
                 );
             case "failed":
-                return <div>Error Component</div>;
+                return (
+                    <div>
+                        <AlertDisplay
+                            severity="error"
+                            title="Registration Problem"
+                            message={rootState.userRegistration.error.error}
+                        />
+                    </div>
+                );
             case "successful":
                 return <div>Verification Message sent!</div>;
         }
