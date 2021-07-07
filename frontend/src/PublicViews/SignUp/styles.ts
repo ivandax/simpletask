@@ -1,10 +1,14 @@
 import { makeStyles } from "@material-ui/core";
 
 export const useSignUpStyles = makeStyles(() => ({
-    signUpContainer: {
+    container: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100%",
+    },
+    signUp: {
         width: "300px",
-        margin: "0 auto",
-        paddingTop: "150px",
     },
     signUpForm: {
         display: "flex",

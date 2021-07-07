@@ -20,44 +20,52 @@ const Login = (): JSX.Element => {
     const classes = useLoginStyles();
     console.log(`renders for Login`);
 
+    const Main = (): JSX.Element => {
+        return (
+            <div className={classes.login}>
+                <Formik
+                    initialValues={initialValues}
+                    validationSchema={validationSchema}
+                    onSubmit={(values): void => console.log(values)}
+                >
+                    {(formik): JSX.Element => (
+                        <form onSubmit={formik.handleSubmit} className={classes.loginForm}>
+                            <StringInput
+                                identifier="email"
+                                label="Email"
+                                value={formik.values.email}
+                                onChange={formik.handleChange}
+                                formikTouched={formik.touched.email}
+                                formikErrors={formik.errors.email}
+                            />
+                            <StringInput
+                                identifier="password"
+                                label="Password"
+                                value={formik.values.password}
+                                onChange={formik.handleChange}
+                                formikTouched={formik.touched.password}
+                                formikErrors={formik.errors.password}
+                                type="password"
+                            />
+                            <Button
+                                color="primary"
+                                variant="contained"
+                                fullWidth
+                                type="submit"
+                                className={classes.submitButton}
+                            >
+                                Submit
+                            </Button>
+                        </form>
+                    )}
+                </Formik>
+            </div>
+        );
+    };
+
     return (
-        <div className={classes.loginContainer}>
-            <Formik
-                initialValues={initialValues}
-                validationSchema={validationSchema}
-                onSubmit={(values): void => console.log(values)}
-            >
-                {(formik): JSX.Element => (
-                    <form onSubmit={formik.handleSubmit} className={classes.loginForm}>
-                        <StringInput
-                            identifier="email"
-                            label="Email"
-                            value={formik.values.email}
-                            onChange={formik.handleChange}
-                            formikTouched={formik.touched.email}
-                            formikErrors={formik.errors.email}
-                        />
-                        <StringInput
-                            identifier="password"
-                            label="Password"
-                            value={formik.values.password}
-                            onChange={formik.handleChange}
-                            formikTouched={formik.touched.password}
-                            formikErrors={formik.errors.password}
-                            type="password"
-                        />
-                        <Button
-                            color="primary"
-                            variant="contained"
-                            fullWidth
-                            type="submit"
-                            className={classes.submitButton}
-                        >
-                            Submit
-                        </Button>
-                    </form>
-                )}
-            </Formik>
+        <div className={classes.container}>
+            <Main />
         </div>
     );
 };

@@ -16,15 +16,16 @@ const PrivateRoute = (): JSX.Element => {
 
 const Root = (): JSX.Element => {
     return (
-        <div>
-            <Router>
-                <Switch>
-                    <Route path="/login" component={Login}></Route>
-                    <Route path="/sign-up" component={SignUp}></Route>
-                    <PrivateRoute />
-                </Switch>
-            </Router>
-        </div>
+        <Router>
+            <Switch>
+                <Route path="/login" component={Login}></Route>
+                <Route path="/sign-up" component={SignUp}></Route>
+                <Route path="/verify">
+                    <div>hello world</div>
+                </Route>
+                <PrivateRoute />
+            </Switch>
+        </Router>
     );
 };
 

@@ -38,78 +38,86 @@ const SignUp = (): JSX.Element => {
     const dispatch = useDispatch();
     const rootState = useSelector((state: State) => state.root);
 
-    switch (rootState.userRegistration.status) {
-        case "pending":
-        case "in-progress":
-        case "re-executing":
-            return (
-                <div className={classes.signUpContainer}>
-                    {rootState.userRegistration.status === "in-progress" ||
-                    rootState.userRegistration.status === "re-executing" ? (
-                        <LoadingOverlay />
-                    ) : null}
-                    <Formik
-                        initialValues={initialValues}
-                        validationSchema={validationSchema}
-                        onSubmit={({ name, email, password }): void => {
-                            dispatch(registerUser(name, email, password));
-                        }}
-                    >
-                        {(formik): JSX.Element => (
-                            <form onSubmit={formik.handleSubmit} className={classes.signUpForm}>
-                                <StringInput
-                                    identifier="name"
-                                    label="Name"
-                                    value={formik.values.name}
-                                    onChange={formik.handleChange}
-                                    formikTouched={formik.touched.name}
-                                    formikErrors={formik.errors.name}
-                                />
-                                <StringInput
-                                    identifier="email"
-                                    label="Email"
-                                    value={formik.values.email}
-                                    onChange={formik.handleChange}
-                                    formikTouched={formik.touched.email}
-                                    formikErrors={formik.errors.email}
-                                />
-                                <StringInput
-                                    identifier="password"
-                                    label="Password"
-                                    value={formik.values.password}
-                                    onChange={formik.handleChange}
-                                    formikTouched={formik.touched.password}
-                                    formikErrors={formik.errors.password}
-                                    type="password"
-                                />
-                                <StringInput
-                                    identifier="repeatPassword"
-                                    label="Repeat Password"
-                                    value={formik.values.repeatPassword}
-                                    onChange={formik.handleChange}
-                                    formikTouched={formik.touched.repeatPassword}
-                                    formikErrors={formik.errors.repeatPassword}
-                                    type="password"
-                                />
-                                <Button
-                                    color="primary"
-                                    variant="contained"
-                                    fullWidth
-                                    type="submit"
-                                    className={classes.submitButton}
-                                >
-                                    Crear
-                                </Button>
-                            </form>
-                        )}
-                    </Formik>
-                </div>
-            );
-        case "failed":
-            return <div>Error Component</div>;
-        case "successful":
-            return <div>Verification Message sent!</div>;
-    }
+    const Main = (): JSX.Element => {
+        switch (rootState.userRegistration.status) {
+            case "pending":
+            case "in-progress":
+            case "re-executing":
+                return (
+                    <div className={classes.signUp}>
+                        {rootState.userRegistration.status === "in-progress" ||
+                        rootState.userRegistration.status === "re-executing" ? (
+                            <LoadingOverlay />
+                        ) : null}
+                        <Formik
+                            initialValues={initialValues}
+                            validationSchema={validationSchema}
+                            onSubmit={({ name, email, password }): void => {
+                                dispatch(registerUser(name, email, password));
+                            }}
+                        >
+                            {(formik): JSX.Element => (
+                                <form onSubmit={formik.handleSubmit} className={classes.signUpForm}>
+                                    <StringInput
+                                        identifier="name"
+                                        label="Name"
+                                        value={formik.values.name}
+                                        onChange={formik.handleChange}
+                                        formikTouched={formik.touched.name}
+                                        formikErrors={formik.errors.name}
+                                    />
+                                    <StringInput
+                                        identifier="email"
+                                        label="Email"
+                                        value={formik.values.email}
+                                        onChange={formik.handleChange}
+                                        formikTouched={formik.touched.email}
+                                        formikErrors={formik.errors.email}
+                                    />
+                                    <StringInput
+                                        identifier="password"
+                                        label="Password"
+                                        value={formik.values.password}
+                                        onChange={formik.handleChange}
+                                        formikTouched={formik.touched.password}
+                                        formikErrors={formik.errors.password}
+                                        type="password"
+                                    />
+                                    <StringInput
+                                        identifier="repeatPassword"
+                                        label="Repeat Password"
+                                        value={formik.values.repeatPassword}
+                                        onChange={formik.handleChange}
+                                        formikTouched={formik.touched.repeatPassword}
+                                        formikErrors={formik.errors.repeatPassword}
+                                        type="password"
+                                    />
+                                    <Button
+                                        color="primary"
+                                        variant="contained"
+                                        fullWidth
+                                        type="submit"
+                                        className={classes.submitButton}
+                                    >
+                                        Crear
+                                    </Button>
+                                </form>
+                            )}
+                        </Formik>
+                    </div>
+                );
+            case "failed":
+                return <div>Error Component</div>;
+            case "successful":
+                return <div>Verification Message sent!</div>;
+        }
+    };
+
+    return (
+        <div className={classes.container}>
+            <Main />
+        </div>
+    );
 };
 
 export default SignUp;
