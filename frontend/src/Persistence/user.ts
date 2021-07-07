@@ -1,9 +1,6 @@
-import * as axiosTypes from "axios";
-import Axios from "axios-observable";
 import { Observable } from "rxjs";
-import { map, catchError } from "rxjs/operators";
+import { map } from "rxjs/operators";
 import * as E from "fp-ts/Either";
-import { pipe } from "fp-ts/function";
 import * as t from "io-ts";
 
 // domain
@@ -12,9 +9,7 @@ import { DefaultError } from "Domain/error";
 
 //persistence
 import { config } from "Persistence/config";
-
-//helpers
-import { Dictionary } from "Helpers/types";
+import * as api from "./api";
 
 // const UserCodec = t.exact(
 //     t.type(
@@ -45,15 +40,7 @@ const SuccessResponseDecoder = t.exact(
 export function registerUser(
     payload: RegistrationPayload
 ): Observable<E.Either<DefaultError, boolean>> {
-    return Axios.post(config.users.register, payload, {
-        headers: {
-            "Content-Type": "application/json",
-        },
-    }).pipe(
-        catchError((error) => {
-            throw parseResponseError(error);
-        }),
-        map(extractResponseBody),
+    return api.post(config.users.register, payload).pipe(
         map(SuccessResponseDecoder.decode),
         map(E.map((decoded) => decoded.success)),
         map(
@@ -65,33 +52,22 @@ export function registerUser(
     );
 }
 
-const errorMessageCodec = t.exact(
-    t.type({
-        _error: t.exact(
-            t.type({
-                message: t.string,
-            })
-        ),
-    })
-);
-
-function extractResponseBody(
-    response: axiosTypes.AxiosResponse<Dictionary<string, unknown>>
-): Dictionary<string, unknown> {
-    return response.data;
+interface VerificationPayload {
+    email: string;
+    token: string;
 }
 
-function parseResponseError(axiosError: axiosTypes.AxiosError): DefaultError {
-    if (axiosError.response === undefined) {
-        return { error: "Network Error" };
-    } else {
-        const defaultMsg = "Undetermined Error";
-        const errorMsg = pipe(
-            axiosError.response.data,
-            errorMessageCodec.decode,
-            E.map((decodedData) => decodedData._error.message),
-            E.getOrElse(() => defaultMsg)
-        );
-        return { error: errorMsg };
-    }
+export function verifyUser(
+    payload: VerificationPayload
+): Observable<E.Either<DefaultError, boolean>> {
+    return api.post(config.users.verify, payload).pipe(
+        map(SuccessResponseDecoder.decode),
+        map(E.map((decoded) => decoded.success)),
+        map(
+            E.mapLeft((errors) => {
+                console.log(errors);
+                return { error: "Success Response Decoding Error" };
+            })
+        )
+    );
 }
