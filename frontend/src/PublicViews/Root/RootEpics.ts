@@ -12,7 +12,7 @@ import * as userPersistence from "Persistence/user";
 
 //domain
 import { DefaultError } from "Domain/error";
-// import { User } from "Domain/user";
+import { User } from "Domain/user";
 
 const registerUserEpic: Epic<
     reducer.RootAction,
@@ -84,4 +84,38 @@ const verifyUserEpic: Epic<
         })
     );
 
-export default [registerUserEpic, verifyUserEpic];
+const loginUserEpic: Epic<
+    reducer.RootAction,
+    reducer.LoginUserSuccessAction | reducer.LoginUserFailureAction
+> = (action$) =>
+    action$.pipe(
+        filter(
+            (action): action is reducer.LoginUserAction =>
+                action.type === reducer.RootActionType.LOGIN_USER
+        ),
+        mergeMap((action) => {
+            return userPersistence
+                .loginUser({
+                    email: action.email,
+                    password: action.password,
+                })
+                .pipe(
+                    map((eitherLoginUser) =>
+                        pipe(
+                            eitherLoginUser,
+                            E.fold<
+                                DefaultError,
+                                { user: User; token: string },
+                                reducer.LoginUserSuccessAction | reducer.LoginUserFailureAction
+                            >(
+                                (error) => reducer.loginUserFailure(error),
+                                (result) => reducer.loginUserSuccess(result)
+                            )
+                        )
+                    ),
+                    catchError((error) => of(reducer.loginUserFailure(error)))
+                );
+        })
+    );
+
+export default [registerUserEpic, verifyUserEpic, loginUserEpic];

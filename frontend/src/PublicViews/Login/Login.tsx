@@ -1,5 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Redirect } from "react-router-dom";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { Button } from "@material-ui/core";
@@ -91,18 +92,7 @@ const Login = (): JSX.Element => {
                     />
                 );
             case "successful":
-                return (
-                    <div className={classes.successMessage}>
-                        <AlertDisplay
-                            severity="success"
-                            title="Email Verification Sent"
-                            message="Please, check your email and click on the link to verify your account"
-                        />
-                        <Button href="/login" variant="outlined" className={classes.redirectButton}>
-                            Go to Login
-                        </Button>
-                    </div>
-                );
+                return <Redirect to="/app" />;
         }
     };
 
