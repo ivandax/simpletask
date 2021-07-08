@@ -41,7 +41,7 @@ const Verify = (): JSX.Element => {
             query,
             UrlParamsDecoder.decode,
             E.fold(
-                () => setDecodingError(O.some("Could not decode query params")),
+                () => setDecodingError(O.some("Oops... something went wrong")),
                 ({ email, ref }) => dispatch(verifyUser(email, ref))
             )
         );
@@ -59,20 +59,11 @@ const Verify = (): JSX.Element => {
                             O.fold(
                                 () => <LoadingOverlay />,
                                 (error) => (
-                                    <>
-                                        <AlertDisplay
-                                            severity="error"
-                                            title="Verification Error"
-                                            message={error}
-                                        />
-                                        <Button
-                                            href="/login"
-                                            variant="outlined"
-                                            className={classes.redirectButton}
-                                        >
-                                            Go to Login
-                                        </Button>
-                                    </>
+                                    <AlertDisplay
+                                        severity="error"
+                                        title="Verification Error"
+                                        message={error}
+                                    />
                                 )
                             )
                         )}
