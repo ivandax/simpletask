@@ -2,6 +2,8 @@ import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import * as E from "fp-ts/Either";
 import * as t from "io-ts";
+import * as Cookies from "es-cookie";
+import { pipe } from "fp-ts/function";
 
 // domain
 import { DefaultError } from "Domain/error";
@@ -93,6 +95,17 @@ export function loginUser(
 ): Observable<E.Either<DefaultError, LoginResponse>> {
     return api.post(config.users.login, payload).pipe(
         map(LoginResponseCodec.decode),
+        map((eitherDecoded) => {
+            pipe(
+                eitherDecoded,
+                E.fold(
+                    // eslint-disable-next-line @typescript-eslint/no-empty-function
+                    () => {},
+                    (decoded) => Cookies.set("simpletask-session", decoded.token)
+                )
+            );
+            return eitherDecoded;
+        }),
         map(
             E.mapLeft((errors) => {
                 console.log(errors);

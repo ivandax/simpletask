@@ -5,7 +5,7 @@ import AlertTitle from "@material-ui/lab/AlertTitle";
 interface AlertDisplayProps {
     severity: "error" | "warning" | "info" | "success";
     title: string;
-    message: string | JSX.Element;
+    message?: string | JSX.Element;
 }
 
 const AlertDisplay = ({ severity, title, message }: AlertDisplayProps): JSX.Element => {

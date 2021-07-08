@@ -37,11 +37,15 @@ const Login = (): JSX.Element => {
             case "pending":
             case "in-progress":
             case "re-executing":
+            case "failed":
                 return (
                     <div className={classes.login}>
                         {loginState.status === "in-progress" ||
                         loginState.status === "re-executing" ? (
                             <LoadingOverlay />
+                        ) : null}
+                        {loginState.status === "failed" ? (
+                            <AlertDisplay severity="error" title="Login Problem" />
                         ) : null}
                         <Formik
                             initialValues={initialValues}
@@ -82,14 +86,6 @@ const Login = (): JSX.Element => {
                             )}
                         </Formik>
                     </div>
-                );
-            case "failed":
-                return (
-                    <AlertDisplay
-                        severity="error"
-                        title="Registration Problem"
-                        message={loginState.error.error}
-                    />
                 );
             case "successful":
                 return <Redirect to="/app" />;
