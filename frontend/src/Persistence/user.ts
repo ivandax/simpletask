@@ -46,7 +46,7 @@ export function registerUser(
         map(
             E.mapLeft((errors) => {
                 console.log(errors);
-                return { error: "Success Response Decoding Error" };
+                return { error: "Registration - success Response Decoding Error" };
             })
         )
     );
@@ -66,7 +66,7 @@ export function verifyUser(
         map(
             E.mapLeft((errors) => {
                 console.log(errors);
-                return { error: "Success Response Decoding Error" };
+                return { error: "Verification - success Response Decoding Error" };
             })
         )
     );

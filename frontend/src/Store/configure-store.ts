@@ -17,7 +17,7 @@ function createRootReducer(): Reducer {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const rootEpic: any = combineEpics(...rootEpics);
+const rootEpic: any = combineEpics<any>(...rootEpics);
 
 export function configureStore(): Store<State> {
     const epicMiddleware = createEpicMiddleware({});

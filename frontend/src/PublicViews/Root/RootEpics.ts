@@ -50,4 +50,38 @@ const registerUserEpic: Epic<
         })
     );
 
-export default [registerUserEpic];
+const verifyUserEpic: Epic<
+    reducer.RootAction,
+    reducer.VerifyUserSuccessAction | reducer.VerifyUserFailureAction
+> = (action$) =>
+    action$.pipe(
+        filter(
+            (action): action is reducer.VerifyUserAction =>
+                action.type === reducer.RootActionType.VERIFY_USER
+        ),
+        mergeMap((action) => {
+            return userPersistence
+                .verifyUser({
+                    email: action.email,
+                    token: action.token,
+                })
+                .pipe(
+                    map((eitherVerifyUser) =>
+                        pipe(
+                            eitherVerifyUser,
+                            E.fold<
+                                DefaultError,
+                                boolean,
+                                reducer.VerifyUserSuccessAction | reducer.VerifyUserFailureAction
+                            >(
+                                (error) => reducer.verifyUserFailure(error),
+                                (result) => reducer.verifyUserSuccess(result)
+                            )
+                        )
+                    ),
+                    catchError((error) => of(reducer.verifyUserFailure(error)))
+                );
+        })
+    );
+
+export default [registerUserEpic, verifyUserEpic];
