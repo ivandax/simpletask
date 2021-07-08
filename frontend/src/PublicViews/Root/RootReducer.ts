@@ -1,15 +1,17 @@
-// import { User } from "Domain/user";
+import { User } from "Domain/user";
 import { AsyncOp } from "Helpers/asyncOp";
 import { DefaultError } from "Domain/error";
 
 export interface RootState {
     userRegistration: AsyncOp<boolean, DefaultError>;
     userVerification: AsyncOp<boolean, DefaultError>;
+    userLogin: AsyncOp<{ user: User; token: string }, DefaultError>;
 }
 
 const initialRootState: RootState = {
     userRegistration: { status: "pending" },
     userVerification: { status: "pending" },
+    userLogin: { status: "pending" },
 };
 
 export enum RootActionType {
@@ -20,6 +22,10 @@ export enum RootActionType {
     VERIFY_USER = "[ROOT] - VERIFY USER",
     VERIFY_USER_SUCCESS = "[ROOT] - VERIFY USER SUCCESS",
     VERIFY_USER_FAILURE = "[ROOT] - VERIFY USER FAILURE",
+
+    LOGIN_USER = "[ROOT] - LOGIN USER",
+    LOGIN_USER_SUCCESS = "[ROOT] - LOGIN USER SUCCESS",
+    LOGIN_USER_FAILURE = "[ROOT] - LOGIN USER FAILURE",
 }
 
 export interface RegisterUserAction {
@@ -49,6 +55,19 @@ export interface VerifyUserFailureAction {
     type: typeof RootActionType.VERIFY_USER_FAILURE;
     error: DefaultError;
 }
+export interface LoginUserAction {
+    type: typeof RootActionType.LOGIN_USER;
+    email: string;
+    password: string;
+}
+export interface LoginUserSuccessAction {
+    type: typeof RootActionType.LOGIN_USER_SUCCESS;
+    result: { user: User; token: string };
+}
+export interface LoginUserFailureAction {
+    type: typeof RootActionType.LOGIN_USER_FAILURE;
+    error: DefaultError;
+}
 
 export type RootAction =
     | RegisterUserAction
@@ -56,7 +75,10 @@ export type RootAction =
     | RegisterUserFailureAction
     | VerifyUserAction
     | VerifyUserSuccessAction
-    | VerifyUserFailureAction;
+    | VerifyUserFailureAction
+    | LoginUserAction
+    | LoginUserSuccessAction
+    | LoginUserFailureAction;
 
 export function registerUser(name: string, email: string, password: string): RegisterUserAction {
     return {
@@ -103,6 +125,28 @@ export function verifyUserFailure(error: DefaultError): VerifyUserFailureAction 
     };
 }
 
+export function loginUser(email: string, password: string): LoginUserAction {
+    return {
+        type: RootActionType.LOGIN_USER,
+        email,
+        password,
+    };
+}
+
+export function loginUserSuccess(result: { user: User; token: string }): LoginUserSuccessAction {
+    return {
+        type: RootActionType.LOGIN_USER_SUCCESS,
+        result,
+    };
+}
+
+export function loginUserFailure(error: DefaultError): LoginUserFailureAction {
+    return {
+        type: RootActionType.LOGIN_USER_FAILURE,
+        error,
+    };
+}
+
 export function rootReducer(state: RootState = initialRootState, action: RootAction): RootState {
     switch (action.type) {
         case RootActionType.REGISTER_USER: {
@@ -122,6 +166,15 @@ export function rootReducer(state: RootState = initialRootState, action: RootAct
         }
         case RootActionType.VERIFY_USER_FAILURE: {
             return { ...state, userVerification: { status: "failed", error: action.error } };
+        }
+        case RootActionType.LOGIN_USER: {
+            return { ...state, userLogin: { status: "in-progress" } };
+        }
+        case RootActionType.LOGIN_USER_SUCCESS: {
+            return { ...state, userLogin: { status: "successful", data: action.result } };
+        }
+        case RootActionType.LOGIN_USER_FAILURE: {
+            return { ...state, userLogin: { status: "failed", error: action.error } };
         }
         default:
             return state;

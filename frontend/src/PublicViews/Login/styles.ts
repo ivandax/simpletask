@@ -18,4 +18,12 @@ export const useLoginStyles = makeStyles(() => ({
     submitButton: {
         marginTop: "20px",
     },
+    successMessage: {
+        display: "flex",
+        flexDirection: "column",
+    },
+    redirectButton: {
+        alignSelf: "center",
+        marginTop: "20px",
+    },
 }));
