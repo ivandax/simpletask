@@ -106,6 +106,7 @@ router.post('/verify', async (req, res) => {
     if (emailToken === verificationDoc.verificationToken) {
         console.log('Email verification match found!');
         await user.update({ verified: true }).catch((e) => res.status(400).send(e));
+        await verificationDoc.remove().catch((e) => res.status(400).send(e));
         res.send(successMessage);
     } else {
         return res.status(400).send(stringError('could not verify user'));
