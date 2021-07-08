@@ -71,9 +71,9 @@ router.post('/login', async (req, res) => {
         return res.status(400).send(stringError('invalid password'));
     }
 
-    //create and assing a json web token for session
+    //create and assign a json web token for session
     const token = jwt.sign({ _id: savedUser._id }, env.TOKEN_SECRET, {
-        expiresIn: 60,
+        expiresIn: 60 * 5,
     });
     res.header('auth-token', token).send({
         user: {
