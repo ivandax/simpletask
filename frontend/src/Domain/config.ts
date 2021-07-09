@@ -5,4 +5,7 @@ export type Config = {
         login: string;
         validateSession: string;
     };
+    variables: {
+        cookieName: string;
+    };
 };

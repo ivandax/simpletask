@@ -1,5 +1,5 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 
 //pages
@@ -7,12 +7,21 @@ import Login from "PublicViews/Login/";
 import SignUp from "PublicViews/SignUp";
 import Verify from "PublicViews/Verify";
 
+// action
+import { validateSession } from "./RootReducer";
+
 // state
 import { State } from "Store/state";
 
 const PrivateRoute = (): JSX.Element => {
-    const loginState = useSelector((state: State) => state.root.userLogin);
-    const authenticated = loginState.status === "successful" && loginState.data.token != undefined;
+    const dispatch = useDispatch();
+    const sessionState = useSelector((state: State) => state.root.sessionValidation);
+
+    useEffect(() => {
+        dispatch(validateSession());
+    }, []);
+
+    const authenticated = sessionState.status === "successful" && sessionState.data === true;
     if (authenticated === false) {
         return <Redirect to="/login" />;
     } else {

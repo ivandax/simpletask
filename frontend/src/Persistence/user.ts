@@ -1,6 +1,7 @@
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { map } from "rxjs/operators";
 import * as E from "fp-ts/Either";
+import * as O from "fp-ts/Option";
 import * as t from "io-ts";
 import * as Cookies from "es-cookie";
 import { pipe } from "fp-ts/function";
@@ -101,7 +102,7 @@ export function loginUser(
                 E.fold(
                     // eslint-disable-next-line @typescript-eslint/no-empty-function
                     () => {},
-                    (decoded) => Cookies.set("simpletask-session", decoded.token)
+                    (decoded) => Cookies.set(config.variables.cookieName, decoded.token)
                 )
             );
             return eitherDecoded;
@@ -115,15 +116,25 @@ export function loginUser(
     );
 }
 
-export function validateSession(session: string): Observable<E.Either<DefaultError, boolean>> {
-    return api.get(config.users.validateSession, session).pipe(
-        map(SuccessResponseDecoder.decode),
-        map(E.map((decoded) => decoded.success)),
-        map(
-            E.mapLeft((errors) => {
-                console.log(errors);
-                return { error: "Valid session - success Response Decoding Error" };
-            })
+export function validateSession(): Observable<E.Either<DefaultError, boolean>> {
+    const cookie = Cookies.get(config.variables.cookieName);
+    return pipe(
+        O.fromNullable(cookie),
+        O.fold(
+            () => {
+                return of(E.left({ error: "token not found" }));
+            },
+            (session) =>
+                api.get(config.users.validateSession, session).pipe(
+                    map(SuccessResponseDecoder.decode),
+                    map(E.map((decoded) => decoded.success)),
+                    map(
+                        E.mapLeft((errors) => {
+                            console.log(errors);
+                            return { error: "Valid session - success Response Decoding Error" };
+                        })
+                    )
+                )
         )
     );
 }
