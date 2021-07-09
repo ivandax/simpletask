@@ -1,12 +1,12 @@
-import { User } from "Domain/user";
 import { AsyncOp } from "Helpers/asyncOp";
 import { DefaultError } from "Domain/error";
 
 export interface RootState {
     userRegistration: AsyncOp<boolean, DefaultError>;
     userVerification: AsyncOp<boolean, DefaultError>;
-    userLogin: AsyncOp<{ user: User; token: string }, DefaultError>;
+    userLogin: AsyncOp<boolean, DefaultError>;
     sessionValidation: AsyncOp<boolean, DefaultError>;
+    session: string | null;
 }
 
 const initialRootState: RootState = {
@@ -14,6 +14,7 @@ const initialRootState: RootState = {
     userVerification: { status: "pending" },
     userLogin: { status: "pending" },
     sessionValidation: { status: "pending" },
+    session: null,
 };
 
 export enum RootActionType {
@@ -68,7 +69,7 @@ export interface LoginUserAction {
 }
 export interface LoginUserSuccessAction {
     type: typeof RootActionType.LOGIN_USER_SUCCESS;
-    result: { user: User; token: string };
+    token: string;
 }
 export interface LoginUserFailureAction {
     type: typeof RootActionType.LOGIN_USER_FAILURE;
@@ -79,7 +80,7 @@ export interface ValidateSessionAction {
 }
 export interface ValidateSessionSuccessAction {
     type: typeof RootActionType.VALIDATE_SESSION_SUCCESS;
-    result: boolean;
+    result: string | null;
 }
 export interface ValidateSessionFailureAction {
     type: typeof RootActionType.VALIDATE_SESSION_FAILURE;
@@ -153,10 +154,10 @@ export function loginUser(email: string, password: string): LoginUserAction {
     };
 }
 
-export function loginUserSuccess(result: { user: User; token: string }): LoginUserSuccessAction {
+export function loginUserSuccess(token: string): LoginUserSuccessAction {
     return {
         type: RootActionType.LOGIN_USER_SUCCESS,
-        result,
+        token,
     };
 }
 
@@ -173,7 +174,7 @@ export function validateSession(): ValidateSessionAction {
     };
 }
 
-export function validateSessionSuccess(result: boolean): ValidateSessionSuccessAction {
+export function validateSessionSuccess(result: string | null): ValidateSessionSuccessAction {
     return {
         type: RootActionType.VALIDATE_SESSION_SUCCESS,
         result,
@@ -211,7 +212,11 @@ export function rootReducer(state: RootState = initialRootState, action: RootAct
             return { ...state, userLogin: { status: "in-progress" } };
         }
         case RootActionType.LOGIN_USER_SUCCESS: {
-            return { ...state, userLogin: { status: "successful", data: action.result } };
+            return {
+                ...state,
+                userLogin: { status: "successful", data: true },
+                session: action.token,
+            };
         }
         case RootActionType.LOGIN_USER_FAILURE: {
             return { ...state, userLogin: { status: "failed", error: action.error } };
@@ -220,7 +225,11 @@ export function rootReducer(state: RootState = initialRootState, action: RootAct
             return { ...state, sessionValidation: { status: "in-progress" } };
         }
         case RootActionType.VALIDATE_SESSION_SUCCESS: {
-            return { ...state, sessionValidation: { status: "successful", data: action.result } };
+            return {
+                ...state,
+                sessionValidation: { status: "successful", data: true },
+                session: action.result,
+            };
         }
         case RootActionType.VALIDATE_SESSION_FAILURE: {
             return { ...state, sessionValidation: { status: "failed", error: action.error } };

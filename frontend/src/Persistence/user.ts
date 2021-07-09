@@ -8,29 +8,13 @@ import { pipe } from "fp-ts/function";
 
 // domain
 import { DefaultError } from "Domain/error";
-import { User } from "Domain/user";
 
 //persistence
 import { config } from "Persistence/config";
 import * as api from "./api";
 
-const UserCodec = t.exact(
-    t.type(
-        {
-            verified: t.boolean,
-            _id: t.string,
-            name: t.string,
-            email: t.string,
-            createdAt: t.string,
-            updatedAt: t.string,
-        },
-        "UserCodec"
-    )
-);
-
 const LoginResponseCodec = t.exact(
     t.type({
-        user: UserCodec,
         token: t.string,
     })
 );
@@ -87,7 +71,6 @@ interface LoginPayload {
 }
 
 interface LoginResponse {
-    user: User;
     token: string;
 }
 
@@ -116,7 +99,7 @@ export function loginUser(
     );
 }
 
-export function validateSession(): Observable<E.Either<DefaultError, boolean>> {
+export function validateSession(): Observable<E.Either<DefaultError, string | null>> {
     const cookie = Cookies.get(config.variables.cookieName);
     return pipe(
         O.fromNullable(cookie),
@@ -127,7 +110,7 @@ export function validateSession(): Observable<E.Either<DefaultError, boolean>> {
             (session) =>
                 api.get(config.users.validateSession, session).pipe(
                     map(SuccessResponseDecoder.decode),
-                    map(E.map((decoded) => decoded.success)),
+                    map(E.map((decoded) => (decoded.success === true ? session : null))),
                     map(
                         E.mapLeft((errors) => {
                             console.log(errors);

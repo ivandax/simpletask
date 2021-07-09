@@ -12,7 +12,6 @@ import * as userPersistence from "Persistence/user";
 
 //domain
 import { DefaultError } from "Domain/error";
-import { User } from "Domain/user";
 
 const registerUserEpic: Epic<
     reducer.RootAction,
@@ -105,11 +104,11 @@ const loginUserEpic: Epic<
                             eitherLoginUser,
                             E.fold<
                                 DefaultError,
-                                { user: User; token: string },
+                                { token: string },
                                 reducer.LoginUserSuccessAction | reducer.LoginUserFailureAction
                             >(
                                 (error) => reducer.loginUserFailure(error),
-                                (result) => reducer.loginUserSuccess(result)
+                                (result) => reducer.loginUserSuccess(result.token)
                             )
                         )
                     ),
@@ -129,17 +128,18 @@ const validateSessionEpic: Epic<
         ),
         mergeMap(() => {
             return userPersistence.validateSession().pipe(
-                map((eitherSessionValidation) =>
+                map((eitherValidToken) =>
                     pipe(
-                        eitherSessionValidation,
+                        eitherValidToken,
                         E.fold<
                             DefaultError,
-                            boolean,
+                            string | null,
                             | reducer.ValidateSessionSuccessAction
                             | reducer.ValidateSessionFailureAction
                         >(
+                            // ToDo: if session is not found, we should invalidate it
                             (error) => reducer.validateSessionFailure(error),
-                            (result) => reducer.validateSessionSuccess(result)
+                            (validToken) => reducer.validateSessionSuccess(validToken)
                         )
                     )
                 ),

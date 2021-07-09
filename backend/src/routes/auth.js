@@ -80,14 +80,6 @@ router.post('/login', async (req, res) => {
     const token = jwt.sign({ _id: savedUser._id }, env.TOKEN_SECRET, {});
     console.log('login - token generated');
     res.header('auth-token', token).send({
-        user: {
-            verified: savedUser.verified,
-            _id: savedUser.id,
-            name: savedUser.name,
-            email: savedUser.email,
-            createdAt: savedUser.createdAt,
-            updatedAt: savedUser.updatedAt,
-        },
         token,
     });
 });
@@ -119,6 +111,7 @@ router.post('/verify', async (req, res) => {
 
 // this fails if session is not valid
 router.get('/validate-session', verify, async (req, res) => {
+    console.log('validated session');
     res.send(successMessage);
 });
 
