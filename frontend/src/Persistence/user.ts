@@ -114,3 +114,16 @@ export function loginUser(
         )
     );
 }
+
+export function validateSession(session: string): Observable<E.Either<DefaultError, boolean>> {
+    return api.get(config.users.validateSession, session).pipe(
+        map(SuccessResponseDecoder.decode),
+        map(E.map((decoded) => decoded.success)),
+        map(
+            E.mapLeft((errors) => {
+                console.log(errors);
+                return { error: "Valid session - success Response Decoding Error" };
+            })
+        )
+    );
+}

@@ -12,6 +12,20 @@ import { Dictionary } from "Helpers/types";
 // domain
 import { DefaultError } from "Domain/error";
 
+export function get(endpoint: string, session: string): Observable<Dictionary<string, unknown>> {
+    return Axios.post(endpoint, {
+        headers: {
+            "Content-Type": "application/json",
+            "Auth-Token": session,
+        },
+    }).pipe(
+        catchError((error) => {
+            throw parseResponseError(error);
+        }),
+        map(extractResponseBody)
+    );
+}
+
 export function post<T>(endpoint: string, payload: T): Observable<Dictionary<string, unknown>> {
     return Axios.post(endpoint, payload, {
         headers: {

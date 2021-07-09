@@ -3,5 +3,6 @@ export type Config = {
         register: string;
         verify: string;
         login: string;
+        validateSession: string;
     };
 };

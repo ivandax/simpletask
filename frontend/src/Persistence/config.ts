@@ -9,5 +9,6 @@ const config: Config = {
         register: `${url}/users/register`,
         verify: `${url}/users/verify`,
         login: `${url}/users/login`,
+        validateSession: `${url}/users/validate-session`,
     },
 };
