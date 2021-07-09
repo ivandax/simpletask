@@ -118,4 +118,34 @@ const loginUserEpic: Epic<
         })
     );
 
-export default [registerUserEpic, verifyUserEpic, loginUserEpic];
+const validateSessionEpic: Epic<
+    reducer.RootAction,
+    reducer.ValidateSessionSuccessAction | reducer.ValidateSessionFailureAction
+> = (action$) =>
+    action$.pipe(
+        filter(
+            (action): action is reducer.ValidateSessionAction =>
+                action.type === reducer.RootActionType.VALIDATE_SESSION
+        ),
+        mergeMap(() => {
+            return userPersistence.validateSession().pipe(
+                map((eitherSessionValidation) =>
+                    pipe(
+                        eitherSessionValidation,
+                        E.fold<
+                            DefaultError,
+                            boolean,
+                            | reducer.ValidateSessionSuccessAction
+                            | reducer.ValidateSessionFailureAction
+                        >(
+                            (error) => reducer.validateSessionFailure(error),
+                            (result) => reducer.validateSessionSuccess(result)
+                        )
+                    )
+                ),
+                catchError((error) => of(reducer.validateSessionFailure(error)))
+            );
+        })
+    );
+
+export default [registerUserEpic, verifyUserEpic, loginUserEpic, validateSessionEpic];

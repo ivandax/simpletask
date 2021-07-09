@@ -13,7 +13,7 @@ import { Dictionary } from "Helpers/types";
 import { DefaultError } from "Domain/error";
 
 export function get(endpoint: string, session: string): Observable<Dictionary<string, unknown>> {
-    return Axios.post(endpoint, {
+    return Axios.get(endpoint, {
         headers: {
             "Content-Type": "application/json",
             "Auth-Token": session,
