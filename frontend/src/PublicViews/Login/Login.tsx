@@ -32,13 +32,13 @@ const Login = (): JSX.Element => {
     const dispatch = useDispatch();
     const loginState = useSelector((state: State) => state.root.userLogin);
 
-    const Main = (): JSX.Element => {
-        switch (loginState.status) {
-            case "pending":
-            case "in-progress":
-            case "re-executing":
-            case "failed":
-                return (
+    switch (loginState.status) {
+        case "pending":
+        case "in-progress":
+        case "re-executing":
+        case "failed":
+            return (
+                <div className={classes.container}>
                     <div className={classes.login}>
                         {loginState.status === "in-progress" ||
                         loginState.status === "re-executing" ? (
@@ -46,7 +46,7 @@ const Login = (): JSX.Element => {
                         ) : null}
                         {loginState.status === "failed" ? (
                             <AlertDisplay
-                                severity="error"
+                                severity="warning"
                                 title="Could not login"
                                 message="Please, check your email or password"
                             />
@@ -84,23 +84,17 @@ const Login = (): JSX.Element => {
                                         type="submit"
                                         className={classes.submitButton}
                                     >
-                                        Crear
+                                        Login
                                     </Button>
                                 </form>
                             )}
                         </Formik>
                     </div>
-                );
-            case "successful":
-                return <Redirect to="/app" />;
-        }
-    };
-
-    return (
-        <div className={classes.container}>
-            <Main />
-        </div>
-    );
+                </div>
+            );
+        case "successful":
+            return <Redirect to="/app" />;
+    }
 };
 
 export default Login;

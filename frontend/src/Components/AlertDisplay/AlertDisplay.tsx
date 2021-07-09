@@ -10,7 +10,7 @@ interface AlertDisplayProps {
 
 const AlertDisplay = ({ severity, title, message }: AlertDisplayProps): JSX.Element => {
     return (
-        <Alert severity={severity}>
+        <Alert severity={severity} color={severity}>
             <AlertTitle>{title}</AlertTitle>
             {message}
         </Alert>

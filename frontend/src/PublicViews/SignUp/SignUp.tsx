@@ -39,12 +39,12 @@ const SignUp = (): JSX.Element => {
     const dispatch = useDispatch();
     const rootState = useSelector((state: State) => state.root);
 
-    const Main = (): JSX.Element => {
-        switch (rootState.userRegistration.status) {
-            case "pending":
-            case "in-progress":
-            case "re-executing":
-                return (
+    switch (rootState.userRegistration.status) {
+        case "pending":
+        case "in-progress":
+        case "re-executing":
+            return (
+                <div className={classes.container}>
                     <div className={classes.signUp}>
                         {rootState.userRegistration.status === "in-progress" ||
                         rootState.userRegistration.status === "re-executing" ? (
@@ -100,23 +100,27 @@ const SignUp = (): JSX.Element => {
                                         type="submit"
                                         className={classes.submitButton}
                                     >
-                                        Crear
+                                        Create Account
                                     </Button>
                                 </form>
                             )}
                         </Formik>
                     </div>
-                );
-            case "failed":
-                return (
+                </div>
+            );
+        case "failed":
+            return (
+                <div className={classes.container}>
                     <AlertDisplay
                         severity="error"
                         title="Registration Problem"
                         message={rootState.userRegistration.error.error}
                     />
-                );
-            case "successful":
-                return (
+                </div>
+            );
+        case "successful":
+            return (
+                <div className={classes.container}>
                     <div className={classes.successMessage}>
                         <AlertDisplay
                             severity="success"
@@ -127,15 +131,9 @@ const SignUp = (): JSX.Element => {
                             Go to Login
                         </Button>
                     </div>
-                );
-        }
-    };
-
-    return (
-        <div className={classes.container}>
-            <Main />
-        </div>
-    );
+                </div>
+            );
+    }
 };
 
 export default SignUp;
