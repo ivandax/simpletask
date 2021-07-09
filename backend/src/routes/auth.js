@@ -10,7 +10,11 @@ const EmailVerification = require('../models/EmailVerification');
 //helpers
 const { registerValidation, loginValidation } = require('./authValidation');
 const { getVerificationEmail, getNodemailerOptions } = require('./nodemailer');
+
 const { stringError } = require('./helpers');
+
+// session validation
+const verify = require('./verifyToken');
 
 // eslint-disable-next-line no-undef
 const env = process.env;
@@ -72,9 +76,8 @@ router.post('/login', async (req, res) => {
     }
 
     //create and assign a json web token for session
-    const token = jwt.sign({ _id: savedUser._id }, env.TOKEN_SECRET, {
-        expiresIn: 60 * 5,
-    });
+    // { expiresIn: 60 * 5 }
+    const token = jwt.sign({ _id: savedUser._id }, env.TOKEN_SECRET, {});
     console.log('login - token generated');
     res.header('auth-token', token).send({
         user: {
@@ -112,6 +115,11 @@ router.post('/verify', async (req, res) => {
     } else {
         return res.status(400).send(stringError('could not verify user'));
     }
+});
+
+// this fails if session is not valid
+router.get('/validate-session', verify, async (req, res) => {
+    res.send(successMessage);
 });
 
 module.exports = router;

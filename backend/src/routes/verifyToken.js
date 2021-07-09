@@ -8,7 +8,7 @@ const env = process.env;
 module.exports = function (req, res, next) {
     const token = req.header('auth-token');
     if (!token) {
-        return res.status(401).send(stringError('Access denied'));
+        return res.status(401).send(stringError('access denied'));
     }
     try {
         //verified is the payload of the jwt
@@ -16,6 +16,6 @@ module.exports = function (req, res, next) {
         req.user = verified;
         next();
     } catch (err) {
-        res.status(400).send(stringError('Invalid token'));
+        res.status(400).send(stringError('invalid token'));
     }
 };
