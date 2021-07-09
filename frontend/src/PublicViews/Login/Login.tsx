@@ -4,6 +4,7 @@ import { Redirect } from "react-router-dom";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { Button } from "@material-ui/core";
+// import { Close as CloseIcon } from "@material-ui/icons";
 import { useLoginStyles } from "./styles";
 
 //components
@@ -16,6 +17,9 @@ import { State } from "Store/state";
 
 // redux actions
 import { loginUser } from "PublicViews/Root/RootReducer";
+
+// helpers
+import { mapError } from "Helpers/errors";
 
 const validationSchema = yup.object({
     email: yup.string().min(8).email("Enter a valid email").required("Email is required"),
@@ -44,13 +48,6 @@ const Login = (): JSX.Element => {
                         loginState.status === "re-executing" ? (
                             <LoadingOverlay />
                         ) : null}
-                        {loginState.status === "failed" ? (
-                            <AlertDisplay
-                                severity="warning"
-                                title="Could not login"
-                                message="Please, check your email or password"
-                            />
-                        ) : null}
                         <Formik
                             initialValues={initialValues}
                             validationSchema={validationSchema}
@@ -77,6 +74,18 @@ const Login = (): JSX.Element => {
                                         formikErrors={formik.errors.password}
                                         type="password"
                                     />
+                                    {loginState.status === "failed" ? (
+                                        <div className={classes.errorContainer}>
+                                            <AlertDisplay
+                                                severity="warning"
+                                                title="Could not login"
+                                                message={mapError(
+                                                    loginState.error,
+                                                    "Please, check your email or password"
+                                                )}
+                                            />
+                                        </div>
+                                    ) : null}
                                     <Button
                                         color="primary"
                                         variant="contained"

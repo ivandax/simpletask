@@ -26,4 +26,7 @@ export const useLoginStyles = makeStyles(() => ({
         alignSelf: "center",
         marginTop: "20px",
     },
+    errorContainer: {
+        marginTop: "20px",
+    },
 }));

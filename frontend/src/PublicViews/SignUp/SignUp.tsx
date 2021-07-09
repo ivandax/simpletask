@@ -16,6 +16,9 @@ import { registerUser } from "PublicViews/Root/RootReducer";
 // state
 import { State } from "Store/state";
 
+// helpers
+import { mapError } from "Helpers/errors";
+
 const validationSchema = yup.object({
     name: yup.string(),
     email: yup.string().email("Enter a valid email").required("Email is required"),
@@ -37,17 +40,17 @@ const SignUp = (): JSX.Element => {
     const classes = useSignUpStyles();
 
     const dispatch = useDispatch();
-    const rootState = useSelector((state: State) => state.root);
+    const registrationState = useSelector((state: State) => state.root.userRegistration);
 
-    switch (rootState.userRegistration.status) {
+    switch (registrationState.status) {
         case "pending":
         case "in-progress":
         case "re-executing":
             return (
                 <div className={classes.container}>
                     <div className={classes.signUp}>
-                        {rootState.userRegistration.status === "in-progress" ||
-                        rootState.userRegistration.status === "re-executing" ? (
+                        {registrationState.status === "in-progress" ||
+                        registrationState.status === "re-executing" ? (
                             <LoadingOverlay />
                         ) : null}
                         <Formik
@@ -114,7 +117,7 @@ const SignUp = (): JSX.Element => {
                     <AlertDisplay
                         severity="error"
                         title="Registration Problem"
-                        message={rootState.userRegistration.error.error}
+                        message={mapError(registrationState.error)}
                     />
                 </div>
             );
