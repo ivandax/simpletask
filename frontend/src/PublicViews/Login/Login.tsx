@@ -18,8 +18,8 @@ import { State } from "Store/state";
 import { loginUser } from "PublicViews/Root/RootReducer";
 
 const validationSchema = yup.object({
-    email: yup.string().email("Enter a valid email").required("Email is required"),
-    password: yup.string().required("Password is required"),
+    email: yup.string().min(8).email("Enter a valid email").required("Email is required"),
+    password: yup.string().min(8).required("Password is required"),
 });
 
 const Login = (): JSX.Element => {
@@ -45,7 +45,11 @@ const Login = (): JSX.Element => {
                             <LoadingOverlay />
                         ) : null}
                         {loginState.status === "failed" ? (
-                            <AlertDisplay severity="error" title="Login Problem" />
+                            <AlertDisplay
+                                severity="error"
+                                title="Could not login"
+                                message="Please, check your email or password"
+                            />
                         ) : null}
                         <Formik
                             initialValues={initialValues}

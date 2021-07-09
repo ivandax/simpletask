@@ -35,7 +35,7 @@ router.post('/register', async (req, res) => {
         password: hashedPassword,
     });
     const savedUser = await user.save().catch((e) => res.status(400).send(e));
-    console.log(`Created User ${savedUser._id}`);
+    console.log(`regsitration - created user ${savedUser._id}`);
     const emailToken = jwt.sign(
         { email: validation.value.email, random: Math.random() * 100 },
         env.EMAIL_TOKEN_SECRET
@@ -46,7 +46,7 @@ router.post('/register', async (req, res) => {
     await smtpTransport
         .sendMail(getVerificationEmail(env.EMAIL_USER, savedUser.email, emailToken))
         .catch((e) => res.status(400).send(e));
-    console.log('verification email sent');
+    console.log('regsitration - verification email sent');
     const emailVerificationDoc = new EmailVerification({
         verificationToken: emailToken,
         userId: savedUser._id,
@@ -58,7 +58,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     const validation = loginValidation(req.body);
     if (validation.error !== undefined) {
-        return res.status(400).send(validation.error.details[0].message);
+        return res.status(400).send(stringError(validation.error.details[0].message));
     }
     //check if email already exists in the database
     const savedUser = await User.findOne({ email: req.body.email });
@@ -75,6 +75,7 @@ router.post('/login', async (req, res) => {
     const token = jwt.sign({ _id: savedUser._id }, env.TOKEN_SECRET, {
         expiresIn: 60 * 5,
     });
+    console.log('login - token generated');
     res.header('auth-token', token).send({
         user: {
             verified: savedUser.verified,
@@ -93,7 +94,7 @@ router.post('/verify', async (req, res) => {
     const emailToken = req.body.token;
     const user = await User.findOne({ email: req.body.email });
     console.log(email, emailToken);
-    console.log(`Found user ${user}`);
+    console.log('verification - found user');
     if (!user) {
         return res.status(400).send(stringError('user not found'));
     }
@@ -104,7 +105,7 @@ router.post('/verify', async (req, res) => {
             .send(stringError('no verification doc exists for this user'));
     }
     if (emailToken === verificationDoc.verificationToken) {
-        console.log('Email verification match found!');
+        console.log('verification - email match found');
         await user.update({ verified: true }).catch((e) => res.status(400).send(e));
         await verificationDoc.remove().catch((e) => res.status(400).send(e));
         res.send(successMessage);
