@@ -2,10 +2,12 @@ import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 
-//pages
+// public pages
 import Login from "PublicViews/Login/";
 import SignUp from "PublicViews/SignUp";
 import Verify from "PublicViews/Verify";
+// private route
+import Layout from "PrivateViews/Layout";
 
 //components
 import LoadingOverlay from "Components/LoadingOverlay";
@@ -16,17 +18,17 @@ import { validateSession } from "./RootReducer";
 // state
 import { State } from "Store/state";
 
-const Main = (): JSX.Element => {
-    return <div>Hello world!</div>;
-};
+interface PrivateRouteProps {
+    path: string;
+}
 
-const PrivateRoute = (): JSX.Element => {
+const PrivateRoute = ({ path }: PrivateRouteProps): JSX.Element => {
     const { session } = useSelector((state: State) => state.root);
 
     if (session === null) {
         return <Redirect to="/login" />;
     } else {
-        return <Route path="/app" render={(): JSX.Element => React.createElement(Main)}></Route>;
+        return <Route path={path} render={(): JSX.Element => <Layout session={session} />}></Route>;
     }
 };
 
@@ -52,7 +54,7 @@ const Root = (): JSX.Element => {
                         <Route path="/login" component={Login}></Route>
                         <Route path="/sign-up" component={SignUp}></Route>
                         <Route path="/verify" component={Verify}></Route>
-                        <PrivateRoute />
+                        <PrivateRoute path="/app" />
                         <Route component={(): JSX.Element => <div>Page not found</div>} />
                         <Redirect from="*" to="/app" />
                     </Switch>

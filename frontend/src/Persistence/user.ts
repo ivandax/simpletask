@@ -105,7 +105,7 @@ export function validateSession(): Observable<E.Either<DefaultError, string | nu
         O.fromNullable(cookie),
         O.fold(
             () => {
-                return of(E.left({ error: "token not found" }));
+                return of(E.left({ error: "cookie not found" }));
             },
             (session) =>
                 api.get(config.users.validateSession, session).pipe(
