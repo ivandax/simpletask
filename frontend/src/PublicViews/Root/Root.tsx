@@ -19,11 +19,9 @@ import { validateSession, removeSession } from "./RootReducer";
 import { State } from "Store/state";
 
 const Root = (): JSX.Element => {
-    console.log("root renders");
     const dispatch = useDispatch();
     const { sessionValidation, session } = useSelector((state: State) => state.root);
     useEffect(() => {
-        console.log("attempts to validate session");
         dispatch(validateSession());
     }, []);
 

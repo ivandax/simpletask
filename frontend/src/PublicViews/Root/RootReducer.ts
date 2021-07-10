@@ -258,9 +258,8 @@ export function rootReducer(state: RootState = initialRootState, action: RootAct
         }
         case RootActionType.VALIDATE_SESSION_FAILURE: {
             return {
-                ...state,
+                ...initialRootState,
                 sessionValidation: { status: "failed", error: action.error },
-                session: null,
             };
         }
         case RootActionType.REMOVE_SESSION: {
