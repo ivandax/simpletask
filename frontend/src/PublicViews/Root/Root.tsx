@@ -18,28 +18,8 @@ import { validateSession, removeSession } from "./RootReducer";
 // state
 import { State } from "Store/state";
 
-interface PrivateRouteProps {
-    path: string;
-    session: string | null;
-    logoutCallback: () => void;
-}
-
-const PrivateRoute = ({ path, session, logoutCallback }: PrivateRouteProps): JSX.Element => {
-    if (session === null) {
-        return <Redirect to="/login" />;
-    } else {
-        return (
-            <Route
-                path={path}
-                render={(): JSX.Element => (
-                    <Layout session={session} removeSession={logoutCallback} />
-                )}
-            ></Route>
-        );
-    }
-};
-
 const Root = (): JSX.Element => {
+    console.log("root renders");
     const dispatch = useDispatch();
     const { sessionValidation, session } = useSelector((state: State) => state.root);
     useEffect(() => {
@@ -65,11 +45,16 @@ const Root = (): JSX.Element => {
                         <Route path="/login" component={Login}></Route>
                         <Route path="/sign-up" component={SignUp}></Route>
                         <Route path="/verify" component={Verify}></Route>
-                        <PrivateRoute
-                            path="/app"
-                            session={session}
-                            logoutCallback={logoutCallback}
-                        />
+                        {session === null ? (
+                            <Redirect to="/login" />
+                        ) : (
+                            <Route
+                                path="/app"
+                                render={(): JSX.Element => (
+                                    <Layout session={session} removeSession={logoutCallback} />
+                                )}
+                            ></Route>
+                        )}
                         <Route component={(): JSX.Element => <div>Page not found</div>} />
                         <Redirect from="*" to="/app" />
                     </Switch>
