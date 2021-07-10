@@ -148,7 +148,7 @@ const validateSessionEpic: Epic<
         })
     );
 
-const removeSessionEpic: Epic<reducer.RootAction, reducer.NoOpAction> = (action$) =>
+const removeSessionEpic: Epic<reducer.RootAction, reducer.ValidateSessionAction> = (action$) =>
     action$.pipe(
         filter(
             (action): action is reducer.RemoveSessionAction =>
@@ -156,7 +156,7 @@ const removeSessionEpic: Epic<reducer.RootAction, reducer.NoOpAction> = (action$
         ),
         mergeMap(() => {
             userPersistence.removeSession();
-            return of(reducer.noOp());
+            return of(reducer.validateSession());
         })
     );
 

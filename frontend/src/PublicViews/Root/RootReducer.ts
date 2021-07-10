@@ -264,7 +264,7 @@ export function rootReducer(state: RootState = initialRootState, action: RootAct
             };
         }
         case RootActionType.REMOVE_SESSION: {
-            return { ...state, session: null };
+            return state;
         }
         default:
             return state;
