@@ -148,4 +148,22 @@ const validateSessionEpic: Epic<
         })
     );
 
-export default [registerUserEpic, verifyUserEpic, loginUserEpic, validateSessionEpic];
+const removeSessionEpic: Epic<reducer.RootAction, reducer.NoOpAction> = (action$) =>
+    action$.pipe(
+        filter(
+            (action): action is reducer.RemoveSessionAction =>
+                action.type === reducer.RootActionType.REMOVE_SESSION
+        ),
+        mergeMap(() => {
+            userPersistence.removeSession();
+            return of(reducer.noOp());
+        })
+    );
+
+export default [
+    registerUserEpic,
+    verifyUserEpic,
+    loginUserEpic,
+    validateSessionEpic,
+    removeSessionEpic,
+];

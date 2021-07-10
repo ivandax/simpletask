@@ -13,32 +13,43 @@ import Layout from "PrivateViews/Layout";
 import LoadingOverlay from "Components/LoadingOverlay";
 
 // action
-import { validateSession } from "./RootReducer";
+import { validateSession, removeSession } from "./RootReducer";
 
 // state
 import { State } from "Store/state";
 
 interface PrivateRouteProps {
     path: string;
+    session: string | null;
+    logoutCallback: () => void;
 }
 
-const PrivateRoute = ({ path }: PrivateRouteProps): JSX.Element => {
-    const { session } = useSelector((state: State) => state.root);
-
+const PrivateRoute = ({ path, session, logoutCallback }: PrivateRouteProps): JSX.Element => {
     if (session === null) {
         return <Redirect to="/login" />;
     } else {
-        return <Route path={path} render={(): JSX.Element => <Layout session={session} />}></Route>;
+        return (
+            <Route
+                path={path}
+                render={(): JSX.Element => (
+                    <Layout session={session} removeSession={logoutCallback} />
+                )}
+            ></Route>
+        );
     }
 };
 
 const Root = (): JSX.Element => {
     const dispatch = useDispatch();
+    const { sessionValidation, session } = useSelector((state: State) => state.root);
     useEffect(() => {
+        console.log("attempts to validate session");
         dispatch(validateSession());
     }, []);
 
-    const { sessionValidation } = useSelector((state: State) => state.root);
+    const logoutCallback = (): void => {
+        dispatch(removeSession());
+    };
 
     switch (sessionValidation.status) {
         case "pending":
@@ -54,7 +65,11 @@ const Root = (): JSX.Element => {
                         <Route path="/login" component={Login}></Route>
                         <Route path="/sign-up" component={SignUp}></Route>
                         <Route path="/verify" component={Verify}></Route>
-                        <PrivateRoute path="/app" />
+                        <PrivateRoute
+                            path="/app"
+                            session={session}
+                            logoutCallback={logoutCallback}
+                        />
                         <Route component={(): JSX.Element => <div>Page not found</div>} />
                         <Redirect from="*" to="/app" />
                     </Switch>

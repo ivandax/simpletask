@@ -3,13 +3,13 @@ import React from "react";
 import Header from "Components/Header";
 
 interface HomeProps {
-    session: string;
+    removeSession: () => void;
 }
 
-const Home = ({ session }: HomeProps): JSX.Element => {
+const Home = ({ removeSession }: HomeProps): JSX.Element => {
     return (
         <div>
-            <Header session={session} />
+            <Header removeSession={removeSession} />
         </div>
     );
 };

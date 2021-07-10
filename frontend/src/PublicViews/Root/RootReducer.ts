@@ -33,6 +33,10 @@ export enum RootActionType {
     VALIDATE_SESSION = "[ROOT] - VALIDATE SESSION",
     VALIDATE_SESSION_SUCCESS = "[ROOT] - VALIDATE SESSION SUCCESS",
     VALIDATE_SESSION_FAILURE = "[ROOT] - VALIDATE SESSION FAILURE",
+
+    REMOVE_SESSION = "[ROOT] - REMOVE SESSION",
+
+    NO_OP = "[ROOT] - NO OP",
 }
 
 export interface RegisterUserAction {
@@ -87,6 +91,13 @@ export interface ValidateSessionFailureAction {
     error: DefaultError;
 }
 
+export interface RemoveSessionAction {
+    type: typeof RootActionType.REMOVE_SESSION;
+}
+export interface NoOpAction {
+    type: typeof RootActionType.NO_OP;
+}
+
 export type RootAction =
     | RegisterUserAction
     | RegisterUserSuccessAction
@@ -99,7 +110,9 @@ export type RootAction =
     | LoginUserFailureAction
     | ValidateSessionAction
     | ValidateSessionSuccessAction
-    | ValidateSessionFailureAction;
+    | ValidateSessionFailureAction
+    | RemoveSessionAction
+    | NoOpAction;
 
 export function registerUser(name: string, email: string, password: string): RegisterUserAction {
     return {
@@ -188,6 +201,18 @@ export function validateSessionFailure(error: DefaultError): ValidateSessionFail
     };
 }
 
+export function removeSession(): RemoveSessionAction {
+    return {
+        type: RootActionType.REMOVE_SESSION,
+    };
+}
+
+export function noOp(): NoOpAction {
+    return {
+        type: RootActionType.NO_OP,
+    };
+}
+
 export function rootReducer(state: RootState = initialRootState, action: RootAction): RootState {
     switch (action.type) {
         case RootActionType.REGISTER_USER: {
@@ -232,7 +257,14 @@ export function rootReducer(state: RootState = initialRootState, action: RootAct
             };
         }
         case RootActionType.VALIDATE_SESSION_FAILURE: {
-            return { ...state, sessionValidation: { status: "failed", error: action.error } };
+            return {
+                ...state,
+                sessionValidation: { status: "failed", error: action.error },
+                session: null,
+            };
+        }
+        case RootActionType.REMOVE_SESSION: {
+            return { ...state, session: null };
         }
         default:
             return state;

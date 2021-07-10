@@ -5,13 +5,17 @@ import Home from "PrivateViews/Home";
 
 interface LayoutProps {
     session: string;
+    removeSession: () => void;
 }
 
-const Layout = ({ session }: LayoutProps): JSX.Element => {
+const Layout = ({ removeSession }: LayoutProps): JSX.Element => {
     return (
         <Router>
             <Switch>
-                <Route path="/app" render={(): JSX.Element => <Home session={session} />} />
+                <Route
+                    path="/app"
+                    render={(): JSX.Element => <Home removeSession={removeSession} />}
+                />
                 <Route path="/app/*" exact render={(): JSX.Element => <Redirect to="/app" />} />
             </Switch>
         </Router>

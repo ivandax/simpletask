@@ -121,3 +121,7 @@ export function validateSession(): Observable<E.Either<DefaultError, string | nu
         )
     );
 }
+
+export function removeSession(): void {
+    Cookies.remove(config.variables.cookieName);
+}
