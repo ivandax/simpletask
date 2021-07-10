@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Redirect } from "react-router-dom";
+import { Redirect, Link } from "react-router-dom";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { Button } from "@material-ui/core";
@@ -11,6 +11,7 @@ import { useLoginStyles } from "./styles";
 import StringInput from "Components/StringInput";
 import LoadingOverlay from "Components/LoadingOverlay";
 import AlertDisplay from "Components/AlertDisplay";
+import Brand from "Components/Brand";
 
 // state
 import { State } from "Store/state";
@@ -56,6 +57,7 @@ const Login = ({ userIsAuthenticated }: LoginProps): JSX.Element => {
                         loginState.status === "re-executing" ? (
                             <LoadingOverlay />
                         ) : null}
+                        <Brand text="Login" />
                         <Formik
                             initialValues={initialValues}
                             validationSchema={validationSchema}
@@ -106,6 +108,14 @@ const Login = ({ userIsAuthenticated }: LoginProps): JSX.Element => {
                                 </form>
                             )}
                         </Formik>
+                        <div className={classes.links}>
+                            <Link to={"/sign-up"} className={classes.link}>
+                                Create Account
+                            </Link>
+                            <Link to={"/recover-password"} className={classes.link}>
+                                I forgot my password
+                            </Link>
+                        </div>
                     </div>
                 </div>
             );

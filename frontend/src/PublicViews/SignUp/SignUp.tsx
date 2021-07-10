@@ -5,6 +5,7 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import { Button } from "@material-ui/core";
 import { useSignUpStyles } from "./styles";
+import Brand from "Components/Brand";
 
 //components
 import StringInput from "Components/StringInput";
@@ -62,6 +63,7 @@ const SignUp = ({ userIsAuthenticated }: SignUpProps): JSX.Element => {
                         registrationState.status === "re-executing" ? (
                             <LoadingOverlay />
                         ) : null}
+                        <Brand text="Login" />
                         <Formik
                             initialValues={initialValues}
                             validationSchema={validationSchema}
