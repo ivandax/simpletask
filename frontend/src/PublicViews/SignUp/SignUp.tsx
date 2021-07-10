@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Redirect } from "react-router-dom";
+import { Redirect, Link } from "react-router-dom";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { Button } from "@material-ui/core";
@@ -119,6 +119,11 @@ const SignUp = ({ userIsAuthenticated }: SignUpProps): JSX.Element => {
                                 </form>
                             )}
                         </Formik>
+                        <div className={classes.links}>
+                            <Link to={"/login"} className={classes.link}>
+                                Already have an account? Log in
+                            </Link>
+                        </div>
                     </div>
                 </div>
             );

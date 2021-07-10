@@ -26,4 +26,13 @@ export const useSignUpStyles = makeStyles(() => ({
         alignSelf: "center",
         marginTop: "20px",
     },
+    links: {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        marginTop: "20px",
+    },
+    link: {
+        padding: "4px",
+    },
 }));
