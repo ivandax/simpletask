@@ -26,7 +26,7 @@ const PrivateRoute = (): JSX.Element => {
     if (session === null) {
         return <Redirect to="/login" />;
     } else {
-        return <Route path="/app" component={Main}></Route>;
+        return <Route path="/app" render={(): JSX.Element => React.createElement(Main)}></Route>;
     }
 };
 
@@ -48,16 +48,13 @@ const Root = (): JSX.Element => {
             return (
                 <Router>
                     <Switch>
-                        <Route
-                            path="/"
-                            exact
-                            component={(): JSX.Element => <Redirect to="/app" />}
-                        />
-                        <PrivateRoute />
+                        <Route path="/" exact render={(): JSX.Element => <Redirect to="/app" />} />
                         <Route path="/login" component={Login}></Route>
                         <Route path="/sign-up" component={SignUp}></Route>
                         <Route path="/verify" component={Verify}></Route>
-                        <Route component={(): JSX.Element => <div>Not found</div>} />
+                        <PrivateRoute />
+                        <Route component={(): JSX.Element => <div>Page not found</div>} />
+                        <Redirect from="*" to="/app" />
                     </Switch>
                 </Router>
             );
