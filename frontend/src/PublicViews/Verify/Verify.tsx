@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router";
+import { Redirect } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { Button } from "@material-ui/core";
 import { useVerifyStyles } from "./styles";
@@ -26,7 +27,11 @@ const UrlParamsDecoder = t.exact(
     })
 );
 
-const Verify = (): JSX.Element => {
+interface VerifyProps {
+    userIsAuthenticated: boolean;
+}
+
+const Verify = ({ userIsAuthenticated }: VerifyProps): JSX.Element => {
     const classes = useVerifyStyles();
     const location = useLocation();
     const dispatch = useDispatch();
@@ -47,12 +52,16 @@ const Verify = (): JSX.Element => {
         );
     }, []);
 
-    const Main = (): JSX.Element => {
-        switch (verificationState.status) {
-            case "pending":
-            case "in-progress":
-            case "re-executing":
-                return (
+    if (userIsAuthenticated) {
+        return <Redirect to="/app" />;
+    }
+
+    switch (verificationState.status) {
+        case "pending":
+        case "in-progress":
+        case "re-executing":
+            return (
+                <div className={classes.container}>
                     <div className={classes.verify}>
                         {pipe(
                             decodingError,
@@ -68,17 +77,21 @@ const Verify = (): JSX.Element => {
                             )
                         )}
                     </div>
-                );
-            case "failed":
-                return (
+                </div>
+            );
+        case "failed":
+            return (
+                <div className={classes.container}>
                     <AlertDisplay
                         severity="error"
                         title="Verification Problem"
                         message={verificationState.error.error}
                     />
-                );
-            case "successful":
-                return (
+                </div>
+            );
+        case "successful":
+            return (
+                <div className={classes.container}>
                     <div className={classes.successMessage}>
                         <AlertDisplay
                             severity="success"
@@ -89,15 +102,9 @@ const Verify = (): JSX.Element => {
                             Go to Login
                         </Button>
                     </div>
-                );
-        }
-    };
-
-    return (
-        <div className={classes.container}>
-            <Main />
-        </div>
-    );
+                </div>
+            );
+    }
 };
 
 export default Verify;

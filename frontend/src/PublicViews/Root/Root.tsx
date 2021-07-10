@@ -29,6 +29,8 @@ const Root = (): JSX.Element => {
         dispatch(removeSession());
     };
 
+    const userIsAuthenticated = session !== null;
+
     switch (sessionValidation.status) {
         case "pending":
         case "in-progress":
@@ -40,18 +42,24 @@ const Root = (): JSX.Element => {
                 <Router>
                     <Switch>
                         <Route path="/" exact render={(): JSX.Element => <Redirect to="/app" />} />
-                        <Route path="/login" component={Login}></Route>
-                        <Route path="/sign-up" component={SignUp}></Route>
-                        <Route path="/verify" component={Verify}></Route>
-                        {session === null ? (
-                            <Redirect to="/login" />
-                        ) : (
+                        <Route path="/login">
+                            <Login userIsAuthenticated={userIsAuthenticated} />
+                        </Route>
+                        <Route path="/sign-up">
+                            <SignUp userIsAuthenticated={userIsAuthenticated} />
+                        </Route>
+                        <Route path="/verify">
+                            <Verify userIsAuthenticated={userIsAuthenticated} />
+                        </Route>
+                        {session !== null ? (
                             <Route
                                 path="/app"
                                 render={(): JSX.Element => (
                                     <Layout session={session} removeSession={logoutCallback} />
                                 )}
                             ></Route>
+                        ) : (
+                            <Redirect to="/login" />
                         )}
                         <Route component={(): JSX.Element => <div>Page not found</div>} />
                         <Redirect from="*" to="/app" />

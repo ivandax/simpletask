@@ -107,10 +107,10 @@ export function validateSession(): Observable<E.Either<DefaultError, string | nu
             () => {
                 return of(E.left({ error: "cookie not found" }));
             },
-            (session) =>
-                api.get(config.users.validateSession, session).pipe(
+            (maybeValidToken) =>
+                api.get(config.users.validateSession, maybeValidToken).pipe(
                     map(SuccessResponseDecoder.decode),
-                    map(E.map((decoded) => (decoded.success === true ? session : null))),
+                    map(E.map((decoded) => (decoded.success === true ? maybeValidToken : null))),
                     map(
                         E.mapLeft((errors) => {
                             console.log(errors);

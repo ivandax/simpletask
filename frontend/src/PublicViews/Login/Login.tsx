@@ -26,7 +26,11 @@ const validationSchema = yup.object({
     password: yup.string().min(8).required("Password is required"),
 });
 
-const Login = (): JSX.Element => {
+interface LoginProps {
+    userIsAuthenticated: boolean;
+}
+
+const Login = ({ userIsAuthenticated }: LoginProps): JSX.Element => {
     const initialValues = {
         email: "",
         password: "",
@@ -35,6 +39,10 @@ const Login = (): JSX.Element => {
 
     const dispatch = useDispatch();
     const loginState = useSelector((state: State) => state.root.userLogin);
+
+    if (userIsAuthenticated) {
+        return <Redirect to="/app" />;
+    }
 
     switch (loginState.status) {
         case "pending":

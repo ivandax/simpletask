@@ -1,5 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Redirect } from "react-router-dom";
 import { Formik } from "formik";
 import * as yup from "yup";
 import { Button } from "@material-ui/core";
@@ -30,7 +31,11 @@ const validationSchema = yup.object({
         .oneOf([yup.ref("password"), null], "The passwords are not equal"),
 });
 
-const SignUp = (): JSX.Element => {
+interface SignUpProps {
+    userIsAuthenticated: boolean;
+}
+
+const SignUp = ({ userIsAuthenticated }: SignUpProps): JSX.Element => {
     const initialValues = {
         name: "",
         email: "",
@@ -41,6 +46,10 @@ const SignUp = (): JSX.Element => {
 
     const dispatch = useDispatch();
     const registrationState = useSelector((state: State) => state.root.userRegistration);
+
+    if (userIsAuthenticated) {
+        return <Redirect to="/app" />;
+    }
 
     switch (registrationState.status) {
         case "pending":
