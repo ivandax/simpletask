@@ -7,6 +7,7 @@ export interface RootState {
     userLogin: AsyncOp<boolean, DefaultError>;
     sessionValidation: AsyncOp<boolean, DefaultError>;
     session: string | null;
+    passwordRecovery: AsyncOp<boolean, DefaultError>;
 }
 
 const initialRootState: RootState = {
@@ -15,6 +16,7 @@ const initialRootState: RootState = {
     userLogin: { status: "pending" },
     sessionValidation: { status: "pending" },
     session: null,
+    passwordRecovery: { status: "pending" },
 };
 
 export enum RootActionType {
@@ -33,6 +35,10 @@ export enum RootActionType {
     VALIDATE_SESSION = "[ROOT] - VALIDATE SESSION",
     VALIDATE_SESSION_SUCCESS = "[ROOT] - VALIDATE SESSION SUCCESS",
     VALIDATE_SESSION_FAILURE = "[ROOT] - VALIDATE SESSION FAILURE",
+
+    RECOVER_PASSWORD = "[ROOT] - RECOVER PASSWORD",
+    RECOVER_PASSWORD_SUCCESS = "[ROOT] - RECOVER PASSWORD SUCCESS",
+    RECOVER_PASSWORD_FAILURE = "[ROOT] - RECOVER PASSWORD FAILURE",
 
     REMOVE_SESSION = "[ROOT] - REMOVE SESSION",
 
@@ -90,6 +96,18 @@ export interface ValidateSessionFailureAction {
     type: typeof RootActionType.VALIDATE_SESSION_FAILURE;
     error: DefaultError;
 }
+export interface RecoverPasswordAction {
+    type: typeof RootActionType.RECOVER_PASSWORD;
+    email: string;
+}
+export interface RecoverPasswordSuccessAction {
+    type: typeof RootActionType.RECOVER_PASSWORD_SUCCESS;
+    result: boolean;
+}
+export interface RecoverPasswordFailureAction {
+    type: typeof RootActionType.RECOVER_PASSWORD_FAILURE;
+    error: DefaultError;
+}
 
 export interface RemoveSessionAction {
     type: typeof RootActionType.REMOVE_SESSION;
@@ -111,6 +129,9 @@ export type RootAction =
     | ValidateSessionAction
     | ValidateSessionSuccessAction
     | ValidateSessionFailureAction
+    | RecoverPasswordAction
+    | RecoverPasswordSuccessAction
+    | RecoverPasswordFailureAction
     | RemoveSessionAction
     | NoOpAction;
 
@@ -201,6 +222,27 @@ export function validateSessionFailure(error: DefaultError): ValidateSessionFail
     };
 }
 
+export function recoverPassword(email: string): RecoverPasswordAction {
+    return {
+        type: RootActionType.RECOVER_PASSWORD,
+        email,
+    };
+}
+
+export function recoverPasswordSuccess(result: boolean): RecoverPasswordSuccessAction {
+    return {
+        type: RootActionType.RECOVER_PASSWORD_SUCCESS,
+        result,
+    };
+}
+
+export function recoverPasswordFailure(error: DefaultError): RecoverPasswordFailureAction {
+    return {
+        type: RootActionType.RECOVER_PASSWORD_FAILURE,
+        error,
+    };
+}
+
 export function removeSession(): RemoveSessionAction {
     return {
         type: RootActionType.REMOVE_SESSION,
@@ -261,6 +303,15 @@ export function rootReducer(state: RootState = initialRootState, action: RootAct
                 ...initialRootState,
                 sessionValidation: { status: "failed", error: action.error },
             };
+        }
+        case RootActionType.RECOVER_PASSWORD: {
+            return { ...state, passwordRecovery: { status: "in-progress" } };
+        }
+        case RootActionType.RECOVER_PASSWORD_SUCCESS: {
+            return { ...state, passwordRecovery: { status: "successful", data: action.result } };
+        }
+        case RootActionType.RECOVER_PASSWORD_FAILURE: {
+            return { ...state, passwordRecovery: { status: "failed", error: action.error } };
         }
         case RootActionType.REMOVE_SESSION: {
             return state;

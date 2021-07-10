@@ -10,6 +10,7 @@ const config: Config = {
         verify: `${url}/users/verify`,
         login: `${url}/users/login`,
         validateSession: `${url}/users/validate-session`,
+        passwordRecovery: `${url}/users/recover-password`,
     },
     variables: {
         cookieName: "simpletask-session",

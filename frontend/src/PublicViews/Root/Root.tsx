@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-d
 import Login from "PublicViews/Login/";
 import SignUp from "PublicViews/SignUp";
 import Verify from "PublicViews/Verify";
+import RecoverPassword from "PublicViews/RecoverPassword";
 // private route
 import Layout from "PrivateViews/Layout";
 
@@ -50,6 +51,9 @@ const Root = (): JSX.Element => {
                         </Route>
                         <Route path="/verify">
                             <Verify userIsAuthenticated={userIsAuthenticated} />
+                        </Route>
+                        <Route path="/recover-password">
+                            <RecoverPassword userIsAuthenticated={userIsAuthenticated} />
                         </Route>
                         {session !== null ? (
                             <Route

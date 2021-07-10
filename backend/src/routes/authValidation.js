@@ -17,5 +17,13 @@ const loginValidation = (reqBody) => {
     return schema.validate(reqBody);
 };
 
+const recoverPasswordValidation = (reqBody) => {
+    const schema = Joi.object({
+        email: Joi.string().email().required().min(8),
+    });
+    return schema.validate(reqBody);
+};
+
 module.exports.registerValidation = registerValidation;
 module.exports.loginValidation = loginValidation;
+module.exports.recoverPasswordValidation = recoverPasswordValidation;

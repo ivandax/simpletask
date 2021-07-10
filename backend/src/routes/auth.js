@@ -6,10 +6,19 @@ const jwt = require('jsonwebtoken');
 // models
 const User = require('../models/UserModel');
 const EmailVerification = require('../models/EmailVerification');
+const PasswordRecovery = require('../models/PasswordRecovery');
 
 //helpers
-const { registerValidation, loginValidation } = require('./authValidation');
-const { getVerificationEmail, getNodemailerOptions } = require('./nodemailer');
+const {
+    registerValidation,
+    loginValidation,
+    recoverPasswordValidation,
+} = require('./authValidation');
+const {
+    getVerificationEmail,
+    getNodemailerOptions,
+    getPasswordRecoveryEmail,
+} = require('./nodemailer');
 
 const { stringError } = require('./helpers');
 
@@ -39,7 +48,7 @@ router.post('/register', async (req, res) => {
         password: hashedPassword,
     });
     const savedUser = await user.save().catch((e) => res.status(400).send(e));
-    console.log(`regsitration - created user ${savedUser._id}`);
+    console.log(`registration - created user ${savedUser._id}`);
     const emailToken = jwt.sign(
         { email: validation.value.email, random: Math.random() * 100 },
         env.EMAIL_TOKEN_SECRET
@@ -114,6 +123,39 @@ router.post('/verify', async (req, res) => {
 // this fails if session is not valid
 router.get('/validate-session', verify, async (req, res) => {
     console.log('validated session');
+    res.send(successMessage);
+});
+
+router.post('/recover-password', async (req, res) => {
+    const validation = recoverPasswordValidation(req.body);
+    if (validation.error !== undefined) {
+        return res.status(400).send(stringError(validation.error.details[0].message));
+    }
+    const user = await User.findOne({ email: req.body.email });
+    console.log(`recover password - found user ${user._id}`);
+    if (!user) {
+        return res.status(400).send(stringError('user does not exist'));
+    }
+    const recoveryToken = jwt.sign(
+        { email: validation.value.email, random: Math.random() * 100 },
+        env.PASSWORD_RECOVERY_SECRET
+    );
+    const smtpTransport = nodemailer.createTransport(
+        getNodemailerOptions(env.EMAIL_HOST, env.EMAIL_USER, env.EMAIL_PASSWORD)
+    );
+    await smtpTransport
+        .sendMail(getPasswordRecoveryEmail(env.EMAIL_USER, user.email, recoveryToken))
+        .catch((e) => res.status(400).send(e));
+    console.log('recover password - password recovery email sent');
+    const passwordRecoveryDoc = new PasswordRecovery({
+        recoveryToken,
+        userId: user._id,
+    });
+    await passwordRecoveryDoc
+        .save()
+        .catch(() =>
+            res.status(400).send(stringError(`recover password - db insertion problem`))
+        );
     res.send(successMessage);
 });
 

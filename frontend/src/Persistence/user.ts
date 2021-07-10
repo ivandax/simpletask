@@ -122,6 +122,25 @@ export function validateSession(): Observable<E.Either<DefaultError, string | nu
     );
 }
 
+interface PasswordRecoveryPayload {
+    email: string;
+}
+
+export function recoverPassword(
+    payload: PasswordRecoveryPayload
+): Observable<E.Either<DefaultError, boolean>> {
+    return api.post(config.users.passwordRecovery, payload).pipe(
+        map(SuccessResponseDecoder.decode),
+        map(E.map((decoded) => decoded.success)),
+        map(
+            E.mapLeft((errors) => {
+                console.log(errors);
+                return { error: "Password recovery - success Response Decoding Error" };
+            })
+        )
+    );
+}
+
 export function removeSession(): void {
     Cookies.remove(config.variables.cookieName);
 }

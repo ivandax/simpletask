@@ -1,11 +1,19 @@
-const domain = 'http://localhost:3000/verify';
+const domain = 'http://localhost:3000/';
 
 const getVerificationEmail = (from, to, link) => ({
     from,
     to,
-    subject: 'Testing Email Verification',
+    subject: 'SimpleTask: Verify your email',
     text: `To verify your Simpletask Account, please follow this link: ${link}`,
-    html: `<h3>Simpletask</h3><<p>To verify your Simpletask Data, please follow this <a href="${domain}?ref=${link}&email=${to}">Link</a></p>`,
+    html: `<h3>Simpletask</h3><<p>To verify your Simpletask account, please follow this <a href="${domain}verify?ref=${link}&email=${to}">Link</a></p>`,
+});
+
+const getPasswordRecoveryEmail = (from, to, link) => ({
+    from,
+    to,
+    subject: 'Simpletask: Password reset',
+    text: `To create a new password, please follow this link: ${link}`,
+    html: `<h3>Simpletask</h3><<p>To create a new password, please follow this link <a href="${domain}recover-password?ref=${link}&email=${to}">Link</a></p>`,
 });
 
 const getNodemailerOptions = (host, user, password) => ({
@@ -20,3 +28,4 @@ const getNodemailerOptions = (host, user, password) => ({
 
 module.exports.getVerificationEmail = getVerificationEmail;
 module.exports.getNodemailerOptions = getNodemailerOptions;
+module.exports.getPasswordRecoveryEmail = getPasswordRecoveryEmail;

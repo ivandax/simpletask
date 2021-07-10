@@ -160,10 +160,45 @@ const removeSessionEpic: Epic<reducer.RootAction, reducer.ValidateSessionAction>
         })
     );
 
+const recoverPasswordEpic: Epic<
+    reducer.RootAction,
+    reducer.RecoverPasswordSuccessAction | reducer.RecoverPasswordFailureAction
+> = (action$) =>
+    action$.pipe(
+        filter(
+            (action): action is reducer.RecoverPasswordAction =>
+                action.type === reducer.RootActionType.RECOVER_PASSWORD
+        ),
+        mergeMap((action) => {
+            return userPersistence
+                .recoverPassword({
+                    email: action.email,
+                })
+                .pipe(
+                    map((eitherRecoverPassword) =>
+                        pipe(
+                            eitherRecoverPassword,
+                            E.fold<
+                                DefaultError,
+                                boolean,
+                                | reducer.RecoverPasswordSuccessAction
+                                | reducer.RecoverPasswordFailureAction
+                            >(
+                                (error) => reducer.recoverPasswordFailure(error),
+                                (result) => reducer.recoverPasswordSuccess(result)
+                            )
+                        )
+                    ),
+                    catchError((error) => of(reducer.recoverPasswordFailure(error)))
+                );
+        })
+    );
+
 export default [
     registerUserEpic,
     verifyUserEpic,
     loginUserEpic,
     validateSessionEpic,
     removeSessionEpic,
+    recoverPasswordEpic,
 ];
