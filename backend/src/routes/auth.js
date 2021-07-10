@@ -77,7 +77,9 @@ router.post('/login', async (req, res) => {
 
     //create and assign a json web token for session
     // { expiresIn: 60 * 5 }
-    const token = jwt.sign({ _id: savedUser._id }, env.TOKEN_SECRET, {});
+    const token = jwt.sign({ _id: savedUser._id }, env.TOKEN_SECRET, {
+        expiresIn: 60 * 60 * 8,
+    });
     console.log('login - token generated');
     res.header('auth-token', token).send({
         token,
