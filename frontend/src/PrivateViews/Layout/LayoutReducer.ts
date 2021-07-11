@@ -16,6 +16,8 @@ export enum LayoutActionType {
     GET_USER_INFO = "[LAYOUT] - GET USER INFO",
     GET_USER_INFO_SUCCESS = "[LAYOUT] - GET USER INFO SUCCESS",
     GET_USER_INFO_FAILURE = "[LAYOUT] - GET USER INFO FAILURE",
+
+    RESET_LAYOUT_STATE = "[LAYOUT] - RESET LAYOUT STATE",
 }
 
 export interface GetUserInfoAction {
@@ -31,7 +33,15 @@ export interface GetUserInfoFailureAction {
     error: DefaultError;
 }
 
-export type LayoutAction = GetUserInfoAction | GetUserInfoSuccessAction | GetUserInfoFailureAction;
+export interface ResetLayoutStateAction {
+    type: typeof LayoutActionType.RESET_LAYOUT_STATE;
+}
+
+export type LayoutAction =
+    | GetUserInfoAction
+    | GetUserInfoSuccessAction
+    | GetUserInfoFailureAction
+    | ResetLayoutStateAction;
 
 export function getUserInfo(session: string): GetUserInfoAction {
     return {
@@ -54,6 +64,12 @@ export function getUserInfoFailure(error: DefaultError): GetUserInfoFailureActio
     };
 }
 
+export function resetLayoutState(): ResetLayoutStateAction {
+    return {
+        type: LayoutActionType.RESET_LAYOUT_STATE,
+    };
+}
+
 export function layoutReducer(
     state: LayoutState = initialLayoutState,
     action: LayoutAction
@@ -67,6 +83,9 @@ export function layoutReducer(
         }
         case LayoutActionType.GET_USER_INFO_FAILURE: {
             return { ...state, userInfo: { status: "failed", error: action.error } };
+        }
+        case LayoutActionType.RESET_LAYOUT_STATE: {
+            return initialLayoutState;
         }
         default:
             return state;

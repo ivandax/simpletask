@@ -9,7 +9,7 @@ import Home from "PrivateViews/Home";
 import LoadingOverlay from "Components/LoadingOverlay";
 
 // actions
-import { getUserInfo } from "./LayoutReducer";
+import { getUserInfo, resetLayoutState } from "./LayoutReducer";
 
 // state
 import { State } from "Store/state";
@@ -23,9 +23,10 @@ const Layout = ({ session, removeSession }: LayoutProps): JSX.Element => {
     const userInfoState = useSelector((state: State) => state.layout.userInfo);
 
     useEffect(() => {
-        if (userInfoState.status === "pending") {
-            dispatch(getUserInfo(session));
-        }
+        dispatch(getUserInfo(session));
+        return function onLayoutUnmounts(): void {
+            dispatch(resetLayoutState());
+        };
     }, []);
 
     switch (userInfoState.status) {

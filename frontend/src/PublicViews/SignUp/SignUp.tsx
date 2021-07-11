@@ -63,7 +63,7 @@ const SignUp = ({ userIsAuthenticated }: SignUpProps): JSX.Element => {
                         registrationState.status === "re-executing" ? (
                             <LoadingOverlay />
                         ) : null}
-                        <Brand text="Login" />
+                        <Brand text="Create Account" />
                         <Formik
                             initialValues={initialValues}
                             validationSchema={validationSchema}
