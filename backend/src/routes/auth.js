@@ -133,12 +133,6 @@ router.post('/verify', async (req, res) => {
     }
 });
 
-// this fails if session is not valid
-router.get('/validate-session', verify, async (req, res) => {
-    console.log('validated session');
-    res.send(successMessage);
-});
-
 router.post('/recover-password', async (req, res) => {
     const validation = recoverPasswordValidation(req.body);
     if (validation.error !== undefined) {
@@ -210,6 +204,31 @@ router.post('/set-password', async (req, res) => {
             .status(400)
             .send(stringError('password recovery - could not reset password'));
     }
+});
+
+// ROUTES PROTECTED BY TOKEN
+
+router.get('/validate-session', verify, async (req, res) => {
+    console.log('validated session');
+    res.send(successMessage);
+});
+
+router.get('/info', verify, async (req, res) => {
+    console.log(`get user info - token data: ${req.user}`);
+    const user = await User.findOne({ _id: req.user._id }).catch((e) =>
+        res.status(400).send(e)
+    );
+    if (!user) {
+        return res.status(400).send(stringError('get user failed'));
+    }
+    res.send({
+        _id: user._id,
+        verified: user.verified,
+        name: user.name,
+        email: user.email,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+    });
 });
 
 module.exports = router;
