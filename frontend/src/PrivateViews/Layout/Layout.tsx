@@ -29,10 +29,17 @@ const Layout = ({ session, removeSession }: LayoutProps): JSX.Element => {
         };
     }, []);
 
+    useEffect(() => {
+        if (userInfoState.status === "failed") {
+            removeSession();
+        }
+    }, [userInfoState.status]);
+
     switch (userInfoState.status) {
         case "pending":
         case "in-progress":
         case "re-executing":
+        case "failed":
             return <LoadingOverlay />;
         case "successful":
             return (
@@ -50,8 +57,6 @@ const Layout = ({ session, removeSession }: LayoutProps): JSX.Element => {
                     </Switch>
                 </Router>
             );
-        case "failed":
-            return <div>Error</div>;
     }
 };
 
