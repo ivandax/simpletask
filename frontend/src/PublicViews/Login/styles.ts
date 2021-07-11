@@ -17,6 +17,7 @@ export const useLoginStyles = makeStyles(() => ({
     },
     submitButton: {
         marginTop: "20px",
+        maxWidth: "200px",
     },
     successMessage: {
         display: "flex",
