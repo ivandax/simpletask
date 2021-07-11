@@ -5,6 +5,7 @@ export type Config = {
         login: string;
         validateSession: string;
         passwordRecovery: string;
+        setNewPassword: string;
     };
     variables: {
         cookieName: string;

@@ -194,6 +194,42 @@ const recoverPasswordEpic: Epic<
         })
     );
 
+const setNewPasswordEpic: Epic<
+    reducer.RootAction,
+    reducer.SetNewPasswordSuccessAction | reducer.SetNewPasswordFailureAction
+> = (action$) =>
+    action$.pipe(
+        filter(
+            (action): action is reducer.SetNewPasswordAction =>
+                action.type === reducer.RootActionType.SET_NEW_PASSWORD
+        ),
+        mergeMap((action) => {
+            return userPersistence
+                .setNewPassword({
+                    email: action.email,
+                    token: action.token,
+                    password: action.password,
+                })
+                .pipe(
+                    map((eitherSetNewPassword) =>
+                        pipe(
+                            eitherSetNewPassword,
+                            E.fold<
+                                DefaultError,
+                                boolean,
+                                | reducer.SetNewPasswordSuccessAction
+                                | reducer.SetNewPasswordFailureAction
+                            >(
+                                (error) => reducer.setNewPasswordFailure(error),
+                                (result) => reducer.setNewPasswordSuccess(result)
+                            )
+                        )
+                    ),
+                    catchError((error) => of(reducer.setNewPasswordFailure(error)))
+                );
+        })
+    );
+
 export default [
     registerUserEpic,
     verifyUserEpic,
@@ -201,4 +237,5 @@ export default [
     validateSessionEpic,
     removeSessionEpic,
     recoverPasswordEpic,
+    setNewPasswordEpic,
 ];

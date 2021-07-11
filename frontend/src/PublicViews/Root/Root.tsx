@@ -7,6 +7,7 @@ import Login from "PublicViews/Login/";
 import SignUp from "PublicViews/SignUp";
 import Verify from "PublicViews/Verify";
 import RecoverPassword from "PublicViews/RecoverPassword";
+import SetNewPassword from "PublicViews/SetNewPassword";
 // private route
 import Layout from "PrivateViews/Layout";
 
@@ -54,6 +55,9 @@ const Root = (): JSX.Element => {
                         </Route>
                         <Route path="/recover-password">
                             <RecoverPassword userIsAuthenticated={userIsAuthenticated} />
+                        </Route>
+                        <Route path="/new-password">
+                            <SetNewPassword userIsAuthenticated={userIsAuthenticated} />
                         </Route>
                         {session !== null ? (
                             <Route

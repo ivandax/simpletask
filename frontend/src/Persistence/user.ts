@@ -141,6 +141,27 @@ export function recoverPassword(
     );
 }
 
+interface SetNewPasswordPayload {
+    email: string;
+    token: string;
+    password: string;
+}
+
+export function setNewPassword(
+    payload: SetNewPasswordPayload
+): Observable<E.Either<DefaultError, boolean>> {
+    return api.post(config.users.setNewPassword, payload).pipe(
+        map(SuccessResponseDecoder.decode),
+        map(E.map((decoded) => decoded.success)),
+        map(
+            E.mapLeft((errors) => {
+                console.log(errors);
+                return { error: "Set new password - success Response Decoding Error" };
+            })
+        )
+    );
+}
+
 export function removeSession(): void {
     Cookies.remove(config.variables.cookieName);
 }

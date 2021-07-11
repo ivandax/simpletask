@@ -8,6 +8,7 @@ export interface RootState {
     sessionValidation: AsyncOp<boolean, DefaultError>;
     session: string | null;
     passwordRecovery: AsyncOp<boolean, DefaultError>;
+    setNewPassword: AsyncOp<boolean, DefaultError>;
 }
 
 const initialRootState: RootState = {
@@ -17,6 +18,7 @@ const initialRootState: RootState = {
     sessionValidation: { status: "pending" },
     session: null,
     passwordRecovery: { status: "pending" },
+    setNewPassword: { status: "pending" },
 };
 
 export enum RootActionType {
@@ -39,6 +41,10 @@ export enum RootActionType {
     RECOVER_PASSWORD = "[ROOT] - RECOVER PASSWORD",
     RECOVER_PASSWORD_SUCCESS = "[ROOT] - RECOVER PASSWORD SUCCESS",
     RECOVER_PASSWORD_FAILURE = "[ROOT] - RECOVER PASSWORD FAILURE",
+
+    SET_NEW_PASSWORD = "[ROOT] - SET NEW PASSWORD PASSWORD",
+    SET_NEW_PASSWORD_SUCCESS = "[ROOT] - SET NEW PASSWORDD SUCCESS",
+    SET_NEW_PASSWORD_FAILURE = "[ROOT] - SET NEW PASSWORD FAILURE",
 
     REMOVE_SESSION = "[ROOT] - REMOVE SESSION",
 
@@ -109,6 +115,20 @@ export interface RecoverPasswordFailureAction {
     error: DefaultError;
 }
 
+export interface SetNewPasswordAction {
+    type: typeof RootActionType.SET_NEW_PASSWORD;
+    email: string;
+    token: string;
+    password: string;
+}
+export interface SetNewPasswordSuccessAction {
+    type: typeof RootActionType.SET_NEW_PASSWORD_SUCCESS;
+    result: boolean;
+}
+export interface SetNewPasswordFailureAction {
+    type: typeof RootActionType.SET_NEW_PASSWORD_FAILURE;
+    error: DefaultError;
+}
 export interface RemoveSessionAction {
     type: typeof RootActionType.REMOVE_SESSION;
 }
@@ -132,6 +152,9 @@ export type RootAction =
     | RecoverPasswordAction
     | RecoverPasswordSuccessAction
     | RecoverPasswordFailureAction
+    | SetNewPasswordAction
+    | SetNewPasswordSuccessAction
+    | SetNewPasswordFailureAction
     | RemoveSessionAction
     | NoOpAction;
 
@@ -243,6 +266,33 @@ export function recoverPasswordFailure(error: DefaultError): RecoverPasswordFail
     };
 }
 
+export function setNewPassword(
+    email: string,
+    token: string,
+    password: string
+): SetNewPasswordAction {
+    return {
+        type: RootActionType.SET_NEW_PASSWORD,
+        email,
+        token,
+        password,
+    };
+}
+
+export function setNewPasswordSuccess(result: boolean): SetNewPasswordSuccessAction {
+    return {
+        type: RootActionType.SET_NEW_PASSWORD_SUCCESS,
+        result,
+    };
+}
+
+export function setNewPasswordFailure(error: DefaultError): SetNewPasswordFailureAction {
+    return {
+        type: RootActionType.SET_NEW_PASSWORD_FAILURE,
+        error,
+    };
+}
+
 export function removeSession(): RemoveSessionAction {
     return {
         type: RootActionType.REMOVE_SESSION,
@@ -312,6 +362,15 @@ export function rootReducer(state: RootState = initialRootState, action: RootAct
         }
         case RootActionType.RECOVER_PASSWORD_FAILURE: {
             return { ...state, passwordRecovery: { status: "failed", error: action.error } };
+        }
+        case RootActionType.SET_NEW_PASSWORD: {
+            return { ...state, setNewPassword: { status: "in-progress" } };
+        }
+        case RootActionType.SET_NEW_PASSWORD_SUCCESS: {
+            return { ...state, setNewPassword: { status: "successful", data: action.result } };
+        }
+        case RootActionType.SET_NEW_PASSWORD_FAILURE: {
+            return { ...state, setNewPassword: { status: "failed", error: action.error } };
         }
         case RootActionType.REMOVE_SESSION: {
             return state;
