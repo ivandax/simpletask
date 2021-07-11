@@ -221,13 +221,14 @@ router.get('/info', verify, async (req, res) => {
     if (!user) {
         return res.status(400).send(stringError('get user failed'));
     }
+    console.log(user);
     res.send({
         _id: user._id,
         verified: user.verified,
         name: user.name,
         email: user.email,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
+        createdAt: user.createdAt.toISOString(),
+        updatedAt: user.updatedAt.toISOString(),
     });
 });
 
