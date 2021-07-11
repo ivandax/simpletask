@@ -20,6 +20,7 @@ export enum LayoutActionType {
 
 export interface GetUserInfoAction {
     type: typeof LayoutActionType.GET_USER_INFO;
+    session: string;
 }
 export interface GetUserInfoSuccessAction {
     type: typeof LayoutActionType.GET_USER_INFO_SUCCESS;
@@ -32,9 +33,10 @@ export interface GetUserInfoFailureAction {
 
 export type LayoutAction = GetUserInfoAction | GetUserInfoSuccessAction | GetUserInfoFailureAction;
 
-export function getUserInfo(): GetUserInfoAction {
+export function getUserInfo(session: string): GetUserInfoAction {
     return {
         type: LayoutActionType.GET_USER_INFO,
+        session,
     };
 }
 

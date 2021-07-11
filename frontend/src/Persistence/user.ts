@@ -173,10 +173,11 @@ const UserDecoder = t.type({
 });
 
 export function getUserInfo(session: string): Observable<E.Either<DefaultError, User>> {
-    return api.get(config.users.validateSession, session).pipe(
+    return api.get(config.users.userInfo, session).pipe(
         map(UserDecoder.decode),
         map(
             E.mapLeft((errors) => {
+                console.log("user decoding errors");
                 console.log(errors);
                 return { error: "Get User Info decoding failure" };
             })

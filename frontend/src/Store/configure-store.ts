@@ -10,6 +10,7 @@ import { layoutReducer } from "PrivateViews/Layout/LayoutReducer";
 
 // epics
 import rootEpics from "PublicViews/Root/RootEpics";
+import layoutEpics from "PrivateViews/Layout/LayoutEpics";
 
 function createRootReducer(): Reducer {
     return combineReducers<State>({
@@ -19,7 +20,7 @@ function createRootReducer(): Reducer {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const rootEpic: any = combineEpics<any>(...rootEpics);
+const rootEpic: any = combineEpics<any>(...rootEpics, ...layoutEpics);
 
 export function configureStore(): Store<State> {
     const epicMiddleware = createEpicMiddleware({});
