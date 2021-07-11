@@ -13,7 +13,7 @@ const getPasswordRecoveryEmail = (from, to, link) => ({
     to,
     subject: 'Simpletask: Password reset',
     text: `To create a new password, please follow this link: ${link}`,
-    html: `<h3>Simpletask</h3><<p>To create a new password, please follow this link <a href="${domain}recover-password?ref=${link}&email=${to}">Link</a></p>`,
+    html: `<h3>Simpletask</h3><<p>To create a new password, please follow this link <a href="${domain}new-password?ref=${link}&email=${to}">Link</a></p>`,
 });
 
 const getNodemailerOptions = (host, user, password) => ({

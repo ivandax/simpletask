@@ -13,6 +13,8 @@ const {
     registerValidation,
     loginValidation,
     recoverPasswordValidation,
+    setNewPasswordValidation,
+    verifyAccountValidation,
 } = require('./authValidation');
 const {
     getVerificationEmail,
@@ -59,7 +61,7 @@ router.post('/register', async (req, res) => {
     await smtpTransport
         .sendMail(getVerificationEmail(env.EMAIL_USER, savedUser.email, emailToken))
         .catch((e) => res.status(400).send(e));
-    console.log('regsitration - verification email sent');
+    console.log('registration - verification email sent');
     const emailVerificationDoc = new EmailVerification({
         verificationToken: emailToken,
         userId: savedUser._id,
@@ -96,10 +98,11 @@ router.post('/login', async (req, res) => {
 });
 
 router.post('/verify', async (req, res) => {
-    const email = req.body.email;
-    const emailToken = req.body.token;
+    const validation = verifyAccountValidation(req.body);
+    if (validation.error !== undefined) {
+        return res.status(400).send(stringError(validation.error.details[0].message));
+    }
     const user = await User.findOne({ email: req.body.email });
-    console.log(email, emailToken);
     console.log('verification - found user');
     if (!user) {
         return res.status(400).send(stringError('user not found'));
@@ -110,9 +113,11 @@ router.post('/verify', async (req, res) => {
             .status(400)
             .send(stringError('no verification doc exists for this user'));
     }
-    if (emailToken === verificationDoc.verificationToken) {
+    if (req.body.token === verificationDoc.verificationToken) {
         console.log('verification - email match found');
-        await user.update({ verified: true }).catch((e) => res.status(400).send(e));
+        await User.updateOne({ _id: user._id }, { verified: true }).catch((e) =>
+            res.status(400).send(e)
+        );
         await verificationDoc.remove().catch((e) => res.status(400).send(e));
         res.send(successMessage);
     } else {
@@ -157,6 +162,44 @@ router.post('/recover-password', async (req, res) => {
             res.status(400).send(stringError(`recover password - db insertion problem`))
         );
     res.send(successMessage);
+});
+
+router.post('/set-password', async (req, res) => {
+    const validation = setNewPasswordValidation(req.body);
+    if (validation.error !== undefined) {
+        return res.status(400).send(stringError(validation.error.details[0].message));
+    }
+    const user = await User.findOne({ email: req.body.email }).catch((e) =>
+        res.status(400).send(e)
+    );
+    console.log('password reset - found user');
+    if (!user) {
+        return res.status(400).send(stringError('password reset - user not found'));
+    }
+    const passwordRecoveryDoc = await PasswordRecovery.findOne({
+        userId: user.id,
+    }).catch((e) => res.status(400).send(e));
+    console.log('password reset - found password recovery doc');
+    if (!passwordRecoveryDoc) {
+        return res
+            .status(400)
+            .send(stringError('no password recovery doc exists for this user'));
+    }
+    if (req.body.token === passwordRecoveryDoc.recoveryToken) {
+        console.log('password reset - email match found');
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(req.body.password, salt);
+        await User.updateOne({ _id: user._id }, { password: hashedPassword }).catch((e) =>
+            res.status(400).send(e)
+        );
+        await passwordRecoveryDoc.remove().catch((e) => res.status(400).send(e));
+        res.send(successMessage);
+        console.log('password reset - new password set successfully');
+    } else {
+        return res
+            .status(400)
+            .send(stringError('password recovery - could not reset password'));
+    }
 });
 
 module.exports = router;
