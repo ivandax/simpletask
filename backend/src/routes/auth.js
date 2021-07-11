@@ -38,7 +38,9 @@ router.post('/register', async (req, res) => {
     if (validation.error !== undefined) {
         return res.status(400).send(stringError(validation.error.details[0].message));
     }
-    const emailExists = await User.findOne({ email: req.body.email });
+    const emailExists = await User.findOne({ email: req.body.email }).catch((e) =>
+        res.status(400).send(e)
+    );
     if (emailExists) {
         return res.status(400).send(stringError('user already exists'));
     }
@@ -76,7 +78,9 @@ router.post('/login', async (req, res) => {
         return res.status(400).send(stringError(validation.error.details[0].message));
     }
     //check if email already exists in the database
-    const savedUser = await User.findOne({ email: req.body.email });
+    const savedUser = await User.findOne({ email: req.body.email }).catch((e) =>
+        res.status(400).send(e)
+    );
     if (!savedUser) {
         return res.status(400).send(stringError('email is wrong'));
     }
@@ -102,12 +106,16 @@ router.post('/verify', async (req, res) => {
     if (validation.error !== undefined) {
         return res.status(400).send(stringError(validation.error.details[0].message));
     }
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({ email: req.body.email }).catch((e) =>
+        res.status(400).send(e)
+    );
     console.log('verification - found user');
     if (!user) {
         return res.status(400).send(stringError('user not found'));
     }
-    const verificationDoc = await EmailVerification.findOne({ userId: user.id });
+    const verificationDoc = await EmailVerification.findOne({
+        userId: user.id,
+    }).catch((e) => res.status(400).send(e));
     if (!verificationDoc) {
         return res
             .status(400)
@@ -136,11 +144,13 @@ router.post('/recover-password', async (req, res) => {
     if (validation.error !== undefined) {
         return res.status(400).send(stringError(validation.error.details[0].message));
     }
-    const user = await User.findOne({ email: req.body.email });
-    console.log(`recover password - found user ${user._id}`);
+    const user = await User.findOne({ email: req.body.email }).catch((e) =>
+        res.status(400).send(e)
+    );
     if (!user) {
         return res.status(400).send(stringError('user does not exist'));
     }
+    console.log(`recover password - found user ${user._id}`);
     const recoveryToken = jwt.sign(
         { email: validation.value.email, random: Math.random() * 100 },
         env.PASSWORD_RECOVERY_SECRET
