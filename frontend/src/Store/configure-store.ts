@@ -6,6 +6,7 @@ import { composeWithDevTools } from "redux-devtools-extension/developmentOnly";
 // store
 import { State } from "./state";
 import { rootReducer } from "PublicViews/Root/RootReducer";
+import { layoutReducer } from "PrivateViews/Layout/LayoutReducer";
 
 // epics
 import rootEpics from "PublicViews/Root/RootEpics";
@@ -13,6 +14,7 @@ import rootEpics from "PublicViews/Root/RootEpics";
 function createRootReducer(): Reducer {
     return combineReducers<State>({
         root: rootReducer,
+        layout: layoutReducer,
     });
 }
 
