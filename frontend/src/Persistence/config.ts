@@ -12,6 +12,7 @@ const config: Config = {
         validateSession: `${url}/users/validate-session`,
         passwordRecovery: `${url}/users/recover-password`,
         setNewPassword: `${url}/users/set-password`,
+        userInfo: `${url}/users/info`,
     },
     variables: {
         cookieName: "simpletask-session",

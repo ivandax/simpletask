@@ -8,6 +8,7 @@ import { pipe } from "fp-ts/function";
 
 // domain
 import { DefaultError } from "Domain/error";
+import { User } from "Domain/user";
 
 //persistence
 import { config } from "Persistence/config";
@@ -157,6 +158,27 @@ export function setNewPassword(
             E.mapLeft((errors) => {
                 console.log(errors);
                 return { error: "Set new password - success Response Decoding Error" };
+            })
+        )
+    );
+}
+
+const UserDecoder = t.type({
+    verified: t.boolean,
+    _id: t.string,
+    name: t.string,
+    createdAt: t.string,
+    updatedAt: t.string,
+    email: t.string,
+});
+
+export function getUserInfo(session: string): Observable<E.Either<DefaultError, User>> {
+    return api.get(config.users.validateSession, session).pipe(
+        map(UserDecoder.decode),
+        map(
+            E.mapLeft((errors) => {
+                console.log(errors);
+                return { error: "Get User Info decoding failure" };
             })
         )
     );

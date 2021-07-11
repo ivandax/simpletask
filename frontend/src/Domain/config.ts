@@ -6,6 +6,7 @@ export type Config = {
         validateSession: string;
         passwordRecovery: string;
         setNewPassword: string;
+        userInfo: string;
     };
     variables: {
         cookieName: string;
