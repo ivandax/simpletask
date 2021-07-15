@@ -9,6 +9,7 @@ const config: Config = {
         register: `${url}/users/register`,
         verify: `${url}/users/verify`,
         login: `${url}/users/login`,
+        logout: `${url}/users/logout`,
         validateSession: `${url}/users/validate-session`,
         passwordRecovery: `${url}/users/recover-password`,
         setNewPassword: `${url}/users/set-password`,

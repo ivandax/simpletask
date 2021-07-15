@@ -185,6 +185,20 @@ export function getUserInfo(session: string): Observable<E.Either<DefaultError, 
     );
 }
 
+export function logout(session: string): Observable<E.Either<DefaultError, boolean>> {
+    return api.get(config.users.logout, session).pipe(
+        map(SuccessResponseDecoder.decode),
+        map(E.map((decoded) => decoded.success)),
+        map(
+            E.mapLeft((errors) => {
+                console.log("logout decoding errors");
+                console.log(errors);
+                return { error: "Logout decoding failure" };
+            })
+        )
+    );
+}
+
 export function removeSession(): void {
     Cookies.remove(config.variables.cookieName);
 }

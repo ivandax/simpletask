@@ -3,6 +3,7 @@ export type Config = {
         register: string;
         verify: string;
         login: string;
+        logout: string;
         validateSession: string;
         passwordRecovery: string;
         setNewPassword: string;
