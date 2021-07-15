@@ -148,18 +148,6 @@ const validateSessionEpic: Epic<
         })
     );
 
-const removeSessionEpic: Epic<reducer.RootAction, reducer.ValidateSessionAction> = (action$) =>
-    action$.pipe(
-        filter(
-            (action): action is reducer.RemoveSessionAction =>
-                action.type === reducer.RootActionType.REMOVE_SESSION
-        ),
-        mergeMap(() => {
-            userPersistence.removeSession();
-            return of(reducer.validateSession());
-        })
-    );
-
 const recoverPasswordEpic: Epic<
     reducer.RootAction,
     reducer.RecoverPasswordSuccessAction | reducer.RecoverPasswordFailureAction
@@ -230,6 +218,47 @@ const setNewPasswordEpic: Epic<
         })
     );
 
+const logoutEpic: Epic<
+    reducer.RootAction,
+    reducer.RemoveSessionAction | reducer.LogoutUserFailureAction
+> = (action$) =>
+    action$.pipe(
+        filter(
+            (action): action is reducer.LogoutUserAction =>
+                action.type === reducer.RootActionType.LOGOUT_USER
+        ),
+        mergeMap((action) => {
+            return userPersistence.logout(action.session).pipe(
+                map((eitherLogout) =>
+                    pipe(
+                        eitherLogout,
+                        E.fold<
+                            DefaultError,
+                            boolean,
+                            reducer.RemoveSessionAction | reducer.LogoutUserFailureAction
+                        >(
+                            (error) => reducer.logoutUserFailure(error),
+                            () => reducer.removeSession()
+                        )
+                    )
+                ),
+                catchError((error) => of(reducer.logoutUserFailure(error)))
+            );
+        })
+    );
+
+const removeSessionEpic: Epic<reducer.RootAction, reducer.ValidateSessionAction> = (action$) =>
+    action$.pipe(
+        filter(
+            (action): action is reducer.RemoveSessionAction =>
+                action.type === reducer.RootActionType.REMOVE_SESSION
+        ),
+        mergeMap(() => {
+            userPersistence.removeSession();
+            return of(reducer.validateSession());
+        })
+    );
+
 export default [
     registerUserEpic,
     verifyUserEpic,
@@ -238,4 +267,5 @@ export default [
     removeSessionEpic,
     recoverPasswordEpic,
     setNewPasswordEpic,
+    logoutEpic,
 ];

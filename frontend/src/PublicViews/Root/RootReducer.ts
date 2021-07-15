@@ -5,6 +5,7 @@ export interface RootState {
     userRegistration: AsyncOp<boolean, DefaultError>;
     userVerification: AsyncOp<boolean, DefaultError>;
     userLogin: AsyncOp<boolean, DefaultError>;
+    userLogout: AsyncOp<boolean, DefaultError>;
     sessionValidation: AsyncOp<boolean, DefaultError>;
     session: string | null;
     passwordRecovery: AsyncOp<boolean, DefaultError>;
@@ -15,6 +16,7 @@ const initialRootState: RootState = {
     userRegistration: { status: "pending" },
     userVerification: { status: "pending" },
     userLogin: { status: "pending" },
+    userLogout: { status: "pending" },
     sessionValidation: { status: "pending" },
     session: null,
     passwordRecovery: { status: "pending" },
@@ -46,6 +48,8 @@ export enum RootActionType {
     SET_NEW_PASSWORD_SUCCESS = "[ROOT] - SET NEW PASSWORDD SUCCESS",
     SET_NEW_PASSWORD_FAILURE = "[ROOT] - SET NEW PASSWORD FAILURE",
 
+    LOGOUT_USER = "[ROOT] - LOGOUT USER",
+    LOGOUT_FAILURE = "[ROOT] - LOGOUT USER FAILURE",
     REMOVE_SESSION = "[ROOT] - REMOVE SESSION",
 
     NO_OP = "[ROOT] - NO OP",
@@ -129,6 +133,15 @@ export interface SetNewPasswordFailureAction {
     type: typeof RootActionType.SET_NEW_PASSWORD_FAILURE;
     error: DefaultError;
 }
+
+export interface LogoutUserAction {
+    type: typeof RootActionType.LOGOUT_USER;
+    session: string;
+}
+export interface LogoutUserFailureAction {
+    type: typeof RootActionType.LOGOUT_FAILURE;
+    error: DefaultError;
+}
 export interface RemoveSessionAction {
     type: typeof RootActionType.REMOVE_SESSION;
 }
@@ -155,6 +168,8 @@ export type RootAction =
     | SetNewPasswordAction
     | SetNewPasswordSuccessAction
     | SetNewPasswordFailureAction
+    | LogoutUserAction
+    | LogoutUserFailureAction
     | RemoveSessionAction
     | NoOpAction;
 
@@ -293,6 +308,20 @@ export function setNewPasswordFailure(error: DefaultError): SetNewPasswordFailur
     };
 }
 
+export function logoutUser(session: string): LogoutUserAction {
+    return {
+        type: RootActionType.LOGOUT_USER,
+        session,
+    };
+}
+
+export function logoutUserFailure(error: DefaultError): LogoutUserFailureAction {
+    return {
+        type: RootActionType.LOGOUT_FAILURE,
+        error,
+    };
+}
+
 export function removeSession(): RemoveSessionAction {
     return {
         type: RootActionType.REMOVE_SESSION,
@@ -372,8 +401,14 @@ export function rootReducer(state: RootState = initialRootState, action: RootAct
         case RootActionType.SET_NEW_PASSWORD_FAILURE: {
             return { ...state, setNewPassword: { status: "failed", error: action.error } };
         }
+        case RootActionType.LOGOUT_USER: {
+            return { ...state, userLogout: { status: "in-progress" } };
+        }
+        case RootActionType.LOGOUT_FAILURE: {
+            return { ...state, userLogout: { status: "failed", error: action.error } };
+        }
         case RootActionType.REMOVE_SESSION: {
-            return state;
+            return { ...state, userLogout: { status: "pending" } };
         }
         default:
             return state;

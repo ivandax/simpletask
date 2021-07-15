@@ -15,7 +15,7 @@ import { getUserInfo, resetLayoutState } from "./LayoutReducer";
 import { State } from "Store/state";
 interface LayoutProps {
     session: string;
-    removeSession: () => void;
+    removeSession: (session: string) => void;
 }
 
 const Layout = ({ session, removeSession }: LayoutProps): JSX.Element => {
@@ -31,7 +31,7 @@ const Layout = ({ session, removeSession }: LayoutProps): JSX.Element => {
 
     useEffect(() => {
         if (userInfoState.status === "failed") {
-            removeSession();
+            removeSession(session);
         }
     }, [userInfoState.status]);
 
@@ -47,7 +47,9 @@ const Layout = ({ session, removeSession }: LayoutProps): JSX.Element => {
                     <Switch>
                         <Route
                             path="/app"
-                            render={(): JSX.Element => <Home removeSession={removeSession} />}
+                            render={(): JSX.Element => (
+                                <Home removeSession={removeSession} session={session} />
+                            )}
                         />
                         <Route
                             path="/app/*"

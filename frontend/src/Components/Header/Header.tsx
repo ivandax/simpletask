@@ -5,10 +5,11 @@ import { Menu as MenuIcon, Settings as SettingsIcon } from "@material-ui/icons";
 import { useHeaderStyles } from "./styles";
 
 interface HeaderProps {
-    removeSession: () => void;
+    session: string;
+    removeSession: (session: string) => void;
 }
 
-const Header = ({ removeSession }: HeaderProps): JSX.Element => {
+const Header = ({ removeSession, session }: HeaderProps): JSX.Element => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const handleOpenSettingsMenu = (event: React.MouseEvent<HTMLButtonElement>): void => {
         setAnchorEl(event.currentTarget);
@@ -43,7 +44,7 @@ const Header = ({ removeSession }: HeaderProps): JSX.Element => {
                     onClose={handleCloseSettingsMenu}
                 >
                     <MenuItem>My Profile</MenuItem>
-                    <MenuItem onClick={removeSession}>Logout</MenuItem>
+                    <MenuItem onClick={(): void => removeSession(session)}>Logout</MenuItem>
                 </Menu>
             </Toolbar>
         </AppBar>

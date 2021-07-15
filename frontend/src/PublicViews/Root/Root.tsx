@@ -15,7 +15,7 @@ import Layout from "PrivateViews/Layout";
 import LoadingOverlay from "Components/LoadingOverlay";
 
 // action
-import { validateSession, removeSession } from "./RootReducer";
+import { validateSession, logoutUser } from "./RootReducer";
 
 // state
 import { State } from "Store/state";
@@ -27,8 +27,8 @@ const Root = (): JSX.Element => {
         dispatch(validateSession());
     }, []);
 
-    const logoutCallback = (): void => {
-        dispatch(removeSession());
+    const logoutCallback = (token: string): void => {
+        dispatch(logoutUser(token));
     };
 
     const userIsAuthenticated = session !== null;
