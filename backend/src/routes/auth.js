@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/UserModel');
 const EmailVerification = require('../models/EmailVerification');
 const PasswordRecovery = require('../models/PasswordRecovery');
+const InvalidToken = require('../models/InvalidToken');
 
 //helpers
 const {
@@ -15,17 +16,18 @@ const {
     recoverPasswordValidation,
     setNewPasswordValidation,
     verifyAccountValidation,
-} = require('./authValidation');
+} = require('./validation/authValidation');
 const {
     getVerificationEmail,
     getNodemailerOptions,
     getPasswordRecoveryEmail,
-} = require('./nodemailer');
+} = require('./helpers/nodemailer');
 
-const { stringError } = require('./helpers');
+const { stringError } = require('./helpers/helpers');
 
 // session validation
-const verify = require('./verifyToken');
+const verify = require('./helpers/verifyToken');
+const interceptToken = require('./helpers/interceptToken');
 
 // eslint-disable-next-line no-undef
 const env = process.env;
@@ -213,6 +215,18 @@ router.get('/validate-session', verify, async (req, res) => {
     res.send(successMessage);
 });
 
+router.get('/logout', interceptToken, async (req, res) => {
+    const invalidTokenDoc = new InvalidToken({
+        invalidToken: req.header('auth-token'),
+        userId: req.user._id,
+    });
+    invalidTokenDoc
+        .save()
+        .catch(() => res.status(400).send(stringError('could not add invalid token')));
+    console.log('handled logout');
+    res.send(successMessage);
+});
+
 router.get('/info', verify, async (req, res) => {
     console.log(`get user info - token data: ${req.user}`);
     const user = await User.findOne({ _id: req.user._id }).catch((e) =>
@@ -221,7 +235,7 @@ router.get('/info', verify, async (req, res) => {
     if (!user) {
         return res.status(400).send(stringError('get user failed'));
     }
-    console.log(user);
+    console.log('info - sending user');
     res.send({
         _id: user._id,
         verified: user.verified,

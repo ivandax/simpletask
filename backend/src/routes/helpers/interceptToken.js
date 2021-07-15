@@ -14,8 +14,9 @@ module.exports = function (req, res, next) {
         //verified is the payload of the jwt
         const verified = jwt.verify(token, env.TOKEN_SECRET);
         req.user = verified;
+        console.log('verified', verified._id);
         next();
     } catch (err) {
-        res.status(400).send(stringError('invalid token'));
+        res.status(400).send(stringError('intercepted - invalid token'));
     }
 };
