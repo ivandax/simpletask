@@ -5,6 +5,8 @@ const app = express();
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const compression = require('compression');
+const helmet = require('helmet');
 
 // import routes
 const authRoute = require('./routes/auth');
@@ -29,6 +31,8 @@ const corsOptions = {
 
 app.use(express.json());
 app.use(cors(corsOptions));
+app.use(compression());
+app.use(helmet());
 
 //route middleware
 
